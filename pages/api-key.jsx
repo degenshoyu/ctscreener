@@ -6,7 +6,7 @@ export default function ApiKeyPage() {
   return (
     <DashboardLayout>
     <Head>
-      <title>ctScreener - API Access</title>
+      <title>API Key - ctScreener</title>
       <meta name="description" content="Get access to our self-developed Twitter API." />
       <meta property="og:title" content="ctScreener" />
       <meta property="og:description" content="Get access to our self-developed Twitter API." />

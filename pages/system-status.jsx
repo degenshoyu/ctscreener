@@ -1,3 +1,4 @@
+import Head from "next/head";
 import React, { useEffect, useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import Topbar from "@/components/Topbar";
@@ -25,10 +26,17 @@ export default function SystemStatusPage() {
 
   return (
     <DashboardLayout>
+       <Head>
+        <title>ctScreener - System Status</title>
+        <meta
+          name="description"
+          content="Realtime health and browser pool metrics of ctScreener infrastructure."
+        />
+      </Head>
+    <div className="text-white px-4 py-8">
     <Topbar />
-    <div className="p-6">
       <h1 className="text-3xl font-bold mb-2">System Status</h1>
-      <p className="text-sm text-gray-500 mb-6">Realtime health and usage metrics of Twitter scanning infrastructure</p>
+      <p className="text-gray-400 mb-6">Realtime health and usage metrics of Twitter scanning infrastructure</p>
 
       {statusData.map((container, idx) => (
         <div key={idx} className="mb-6 border rounded-lg p-4 bg-gray-900 text-white">

@@ -6,7 +6,7 @@ export default function XWatcherPage() {
   return (
     <DashboardLayout>
       <Head>
-        <title>ctScreener - X Watcher</title>
+        <title>X Watcher - ctScreener</title>
         <meta name="description" content="Real-time Twitter watcher. Get instant alerts when your favorite KOLs tweet." />
         <meta property="og:title" content="ctScreener - X Watcher" />
         <meta property="og:description" content="Real-time Twitter watcher." />
