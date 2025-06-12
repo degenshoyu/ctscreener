@@ -27,7 +27,7 @@ export default function SystemStatusPage() {
   return (
     <DashboardLayout>
        <Head>
-        <title>ctScreener - System Status</title>
+        <title>System Status - ctScreener</title>
         <meta
           name="description"
           content="Realtime health and browser pool metrics of ctScreener infrastructure."
