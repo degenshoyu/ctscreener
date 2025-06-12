@@ -1,9 +1,18 @@
+import Head from "next/head";
 import DashboardLayout from "@/components/DashboardLayout";
 import Topbar from "@/components/Topbar";
 
 export default function XWatcherPage() {
   return (
     <DashboardLayout>
+      <Head>
+        <title>ctScreener - X Watcher</title>
+        <meta name="description" content="Real-time Twitter watcher. Get instant alerts when your favorite KOLs tweet." />
+        <meta property="og:title" content="ctScreener - X Watcher" />
+        <meta property="og:description" content="Real-time Twitter watcher." />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="/cover.png" />
+      </Head>
       <div className="text-white px-4 py-8">
         <Topbar />
         <h1 className="text-3xl font-bold mb-2">X Watcher</h1>
@@ -13,7 +22,7 @@ export default function XWatcherPage() {
 
         <div className="bg-gray-900 rounded-xl p-6 border border-gray-700 max-w-2xl">
           <h2 className="text-xl font-semibold text-yellow-400 mb-3">
-            📡 X Watcher v0.1 (Alpha)
+            X Watcher v0.1 (Alpha)
           </h2>
           <p className="mb-2">
             The Telegram bot is now live and free to use. Watch up to <strong>3 Twitter accounts</strong> with updates every <strong>30 seconds</strong>.
@@ -53,4 +62,3 @@ export default function XWatcherPage() {
     </DashboardLayout>
   );
 }
-

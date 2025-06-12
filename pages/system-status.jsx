@@ -27,8 +27,8 @@ export default function SystemStatusPage() {
     <DashboardLayout>
     <Topbar />
     <div className="p-6">
-      <h1 className="text-2xl font-bold">System Status</h1>
-      <p className="text-sm text-gray-500 mb-6">Live Twitter scanner servers and their browser pools monitoring</p>
+      <h1 className="text-3xl font-bold mb-2">System Status</h1>
+      <p className="text-sm text-gray-500 mb-6">Realtime health and usage metrics of Twitter scanning infrastructure</p>
 
       {statusData.map((container, idx) => (
         <div key={idx} className="mb-6 border rounded-lg p-4 bg-gray-900 text-white">
