@@ -1,3 +1,4 @@
+import Head from "next/head";
 import { useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -23,6 +24,14 @@ export default function HomePage() {
 
   return (
     <DashboardLayout>
+    <Head>
+      <title>ctScreener - Find Early Callers</title>
+      <meta name="description" content="Discover earliest callers of top Solana tokens on Twitter." />
+      <meta property="og:title" content="ctScreener" />
+      <meta property="og:description" content="Find early Twitter shills and significant token activity." />
+      <meta property="og:type" content="website" />
+      <meta property="og:image" content="/cover.png" />
+    </Head>
       <div className="text-white px-4 py-8">
         <Topbar />
         <h1 className="text-3xl font-bold mb-2">Coin Analyst</h1>
