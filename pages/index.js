@@ -28,7 +28,7 @@ export default function HomePage() {
       <title>ctScreener - Find Early Callers</title>
       <meta name="description" content="Discover earliest callers of top Solana tokens on Twitter." />
       <meta property="og:title" content="ctScreener" />
-      <meta property="og:description" content="Find early Twitter shills and significant token activity." />
+      <meta property="og:description" content="Provide Twitter data of Solana tokens." />
       <meta property="og:type" content="website" />
       <meta property="og:image" content="/cover.png" />
     </Head>
