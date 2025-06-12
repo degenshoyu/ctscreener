@@ -11,6 +11,8 @@ export default function TokenSearchBox({ address, setAddress, isLoading, setIsLo
   const pollJobResult = async (jobId, retries = 250) => {
     if (retries <= 0) {
       console.warn("🛑 Max retries reached.");
+      onSearch(false);
+      setError("Tweet scan timed out – this token may have too many related posts.");
       return;
     }
 
@@ -33,6 +35,8 @@ export default function TokenSearchBox({ address, setAddress, isLoading, setIsLo
       }
     } catch (err) {
       console.error("❌ Failed to poll job:", err);
+      onSearch(false);
+      setError("Polling failed.")
     }
   };
 
