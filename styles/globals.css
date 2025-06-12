@@ -1,0 +1,16 @@
+/* styles/globals.css */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.wallet-adapter-button {
+  height: 40px !important;
+  padding: 0 16px !important;
+  font-size: 14px !important;
+  background: linear-gradient(to right, #6366f1, #8b5cf6) !important;
+  color: white !important;
+  border-radius: 8px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2) !important;
+}
