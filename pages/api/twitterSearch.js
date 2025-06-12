@@ -36,7 +36,7 @@ export default async function handler(req, res) {
   console.log("📤 Sending body to scanner:", body);
 
   try {
-    const response = await fetch("${BASE_URL}/search", {
+    const response = await fetch(`${BASE_URL}/search`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${bearerToken}`,

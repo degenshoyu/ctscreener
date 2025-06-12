@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     const { info } = req.body;
 
     console.log("💾 [API] saveTokenInfo called with:", {
-      address: info?.baseToken?.address,
+      address: info?.address,
     });
 
     if (!info || !info.address) {
@@ -22,12 +22,12 @@ export default async function handler(req, res) {
     await db
       .collection("tokens")
       .updateOne(
-        { "baseToken.address": info.baseToken.address },
+        { "address": info.address },
         { $set: { ...info, savedAt: new Date() } },
         { upsert: true },
       );
 
-    console.log("✅ Token info saved:", info.baseToken.address);
+    console.log("✅ Token info saved:", info.address);
 
     return res.status(200).json({ success: true });
   } catch (err) {

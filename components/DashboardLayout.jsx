@@ -68,15 +68,15 @@ export default function DashboardLayout({ children }) {
             return (
               <Link key={href} href={href} legacyBehavior>
                   {collapsed ? (
-                    <TooltipWrapper label={label}>
-                      <a
-                        className={`block w-full pointer-events-none flex items-center justify-center w-10 h-10 rounded-md transition-colors duration-150 ${
+                    <a
+                        className={`block w-full flex items-center justify-center w-10 h-10 rounded-md transition-colors duration-150 ${
                           active ? "bg-cyan-700" : "hover:bg-gray-700"
                         }`}
                       >
+                       <TooltipWrapper label={label}>
                         <Icon className="w-[18px] h-[18px]" />
-                      </a>
-                    </TooltipWrapper>
+                      </TooltipWrapper>
+                    </a>
                   ) : (
                     <a
                       className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 ${
