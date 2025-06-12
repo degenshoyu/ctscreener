@@ -23,13 +23,13 @@ export default function TokenSearchBox({ address, setAddress, isLoading, setIsLo
         setEarliestTweets(jobJson.tweets.slice(0, 5));
         onTweets(jobJson.tweets.slice(0, 5));
         console.log("✅ Fetched earliest tweets:", jobJson.tweets.slice(0, 5));
-        setLoadingTweets(false);
+        onSearch(false);
       } else if (jobJson.status === "processing") {
         console.log("⏳ Job still processing, retrying...");
         setTimeout(() => pollJobResult(jobId, retries - 1), 3000);
       } else {
         console.warn("⚠️ Unexpected job status:", jobJson);
-        setLoadingTweets(false);
+        onSearch(false);
       }
     } catch (err) {
       console.error("❌ Failed to poll job:", err);
@@ -39,7 +39,7 @@ export default function TokenSearchBox({ address, setAddress, isLoading, setIsLo
   const handleSearch = async () => {
     console.log("🧪 handleSearch triggered");
     console.log("🔍 Starting token search for:", address);
-    setIsLoading(true);
+    onSearch(true);
     setError("");
     try {
       const url = `https://api.dexscreener.com/tokens/v1/solana/${address.trim()}`;
@@ -135,16 +135,6 @@ export default function TokenSearchBox({ address, setAddress, isLoading, setIsLo
 
   return (
     <div className="w-full mb-6">
-    {/* 🔄 加载动画 */}
-    {loadingTweets && (
-      <div className="flex items-center text-gray-400 mb-2 animate-pulse">
-        <svg className="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-        </svg>
-        <span>Scanning tweets related to this token... This may take up to a minute.</span>
-      </div>
-    )}
 
     {/* 原始输入框 + 搜索按钮区域 */}
     <div className="flex gap-2 items-center">
