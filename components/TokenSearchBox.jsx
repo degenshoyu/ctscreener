@@ -8,7 +8,7 @@ export default function TokenSearchBox({ address, setAddress, isLoading, setIsLo
   const [jobId, setJobId] = useState(null);
   const [loadingTweets, setLoadingTweets] = useState(false);
 
-  const pollJobResult = async (jobId, retries = 50) => {
+  const pollJobResult = async (jobId, retries = 250) => {
     if (retries <= 0) {
       console.warn("🛑 Max retries reached.");
       return;
