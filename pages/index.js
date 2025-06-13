@@ -8,6 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import dynamic from "next/dynamic";
 import Topbar from "@/components/Topbar";
 import TokenSearchBox from "@/components/TokenSearchBox";
 import TokenInfoCard from "@/components/TokenInfoCard";

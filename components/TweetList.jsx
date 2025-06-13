@@ -6,16 +6,19 @@ import { MessageCircle, Repeat, Heart, BarChart } from "lucide-react";
 export default function TweetList({ tweets }) {
   useEffect(() => {
     if (typeof window !== "undefined") {
-      if (window.twttr) {
+      if (window.twttr && window.twttr.widgets) {
         window.twttr.widgets.load();
       } else {
         const script = document.createElement("script");
         script.src = "https://platform.twitter.com/widgets.js";
         script.async = true;
+        script.onload = () => {
+          window.twttr && window.twttr.widgets.load();
+        };
         document.body.appendChild(script);
       }
     }
-  }, []);
+  }, [tweets]);
   console.log("🐦 TweetList received tweets:", tweets);
   if (!tweets || tweets.length === 0) {
     return <p className="text-zinc-400 text-sm">No tweets found.</p>;
