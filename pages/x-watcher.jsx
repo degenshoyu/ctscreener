@@ -50,12 +50,8 @@ export default function XWatcherPage() {
             </li>
           </ul>
 
-          <p className="mt-4 text-yellow-300">
-            💡 You can also <strong>add the bot to your Telegram group</strong> for group alerts.
-          </p>
-
           <p className="mt-6 text-sm text-gray-400">
-            We are working on expanding watch slots and launching a premium version with 3–5 second latency.
+            We are working on expanding watch slots and launching a premium version with 3–5 second latency + adding the bot to your Telegram group for group alerts.
           </p>
         </div>
       </div>
