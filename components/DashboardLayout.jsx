@@ -15,6 +15,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import TooltipWrapper from "@/components/ui/TooltipWrapper";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 
 const navItems = [
   { label: "Coin Analyst", href: "/", icon: LayoutDashboard },
@@ -27,7 +28,7 @@ const navItems = [
 
 export default function DashboardLayout({ children }) {
   const router = useRouter();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useLocalStorage("sidebar-collapsed", false);
 
   return (
     <div className="min-h-screen flex bg-black text-white">

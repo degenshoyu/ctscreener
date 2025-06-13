@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-export default function TokenSearchBox({ address, setAddress, isLoading, setIsLoading, onTokenInfo, onTweets, onSearch }) {
+export default function TokenSearchBox({ address, setAddress, isLoading, setIsLoading, onTokenInfo, onTweets, onSearch,onTweetCount }) {
   console.log("🧩 TokenSearchBox mounted");
   const [error, setError] = useState("");
   const [earliestTweets, setEarliestTweets] = useState([]);
   const [jobId, setJobId] = useState(null);
   const [loadingTweets, setLoadingTweets] = useState(false);
 
-  const pollJobResult = async (jobId, retries = 250) => {
+  const pollJobResult = async (jobId, retries = 1500) => {
     if (retries <= 0) {
       console.warn("🛑 Max retries reached.");
       onSearch(false);
@@ -28,6 +28,10 @@ export default function TokenSearchBox({ address, setAddress, isLoading, setIsLo
         onSearch(false);
       } else if (jobJson.status === "processing") {
         console.log("⏳ Job still processing, retrying...");
+        if (onTweetCount && typeof jobJson.tweets_count === "number") {
+          onTweetCount(jobJson.tweets_count);
+          setEarliestTweets([{ tweet_id: null, content: `🧪 Scanning tweets... ${jobJson.tweets_count} Tweets collected via ctScreener Twitter API.` }]);
+        }
         setTimeout(() => pollJobResult(jobId, retries - 1), 3000);
       } else {
         console.warn("⚠️ Unexpected job status:", jobJson);

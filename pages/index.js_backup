@@ -118,9 +118,9 @@ export default function HomePage() {
 
         {scanningTweets && (
           <div className="mt-4 max-w-xl">
-            <div className="flex items-center text-gray-400 mb-2">
+            <div className="flex items-center text-gray-400 mb-4">
               <svg
-                className="animate-spin h-5 w-5 mr-2 text-blue-400"
+                className="animate-spin h-5 w-5 mr-2 text-white"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -139,19 +139,22 @@ export default function HomePage() {
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                 ></path>
               </svg>
-              <span className="text-sm">
-                <span className="text-blue-300">ctScreener</span> is scanning
-                tweets...
+              <span>
+                Scanning tweets related to this token... This may take up to a
+                minute.
               </span>
             </div>
-            <div className="text-sm text-gray-300 ml-7">
-              {tweetCount > 0
-                ? `🔎 Collected ${tweetCount} tweet${tweetCount === 1 ? "" : "s"} so far.`
-                : "🔎 Waiting for tweets to appear..."}
-            </div>
+            <p className="text-gray-400 mt-2 text-sm">
+              🧪 Scanning tweets... {tweetCount} Tweets collected via ctScreener
+              Twitter API.
+            </p>
+            <span className="text-gray-300 text-sm">
+              {earliestTweets.length > 0 &&
+                earliestTweets[0].tweet_id === null &&
+                earliestTweets[0].content}
+            </span>
           </div>
         )}
-
         {tweets.length > 0 && (
           <div className="mt-6 max-w-xl">
             <TweetList tweets={tweets} />
