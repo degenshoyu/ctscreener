@@ -39,7 +39,7 @@ export default function CommunityPage() {
           <div className="bg-gray-900 border border-gray-700 rounded-xl p-5">
             <h2 className="text-xl font-semibold text-blue-400 mb-1">Twitter Community</h2>
             <a href="https://twitter.com/i/communities/your-community-id" target="_blank" rel="noopener noreferrer" className="text-white underline">
-              Join our Twitter Community
+              Coming soon! Will be created if the community requests!
             </a>
           </div>
         </div>
