@@ -1,0 +1,39 @@
+import { useConnectWallet } from "@privy-io/react-auth";
+import { useSolanaWallets } from "@privy-io/react-auth/solana";
+import { usePrivy } from "@privy-io/react-auth";
+
+export default function WalletButton() {
+  const { connectWallet } = useConnectWallet();
+  const { wallets } = useSolanaWallets();
+  const { authenticated, user, logout } = usePrivy();
+
+  const handleLogin = async () => {
+    await connectWallet({
+      walletChainType: "solana-only",
+      walletList: ["phantom", "solflare", "backpack"],
+    });
+
+    for (let i = 0; i < 20; i++) {
+      await new Promise((r) => setTimeout(r, 250));
+      if (wallets[0]?.loginOrLink) {
+        await wallets[0].loginOrLink();
+        break;
+      }
+    }
+  };
+
+  return (
+    <button
+      className={`px-4 py-2 rounded transition-colors duration-150 font-semibold ${
+    authenticated
+      ? "bg-white/10 text-white hover:bg-white/20 border border-white/20"
+      : "bg-purple-600 text-white hover:bg-purple-700"
+  }`}
+      onClick={authenticated ? logout : handleLogin}
+    >
+      {authenticated
+        ? `${user?.wallet?.address?.slice(0, 6)}... Logout`
+        : "Login"}
+    </button>
+  );
+}

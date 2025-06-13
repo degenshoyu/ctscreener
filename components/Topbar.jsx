@@ -1,12 +1,9 @@
 // components/Topbar.jsx
 "use client";
 
-import { useEffect, useState } from "react";
-import DynamicWalletButton from "./DynamicWalletButton";
+import WalletButton from "./WalletButton";
 
 export default function Topbar() {
-  const [isLoginOpen, setLoginOpen] = useState(false);
-
   return (
     <div className="flex justify-end items-center px-6 mb-10 space-x-4">
       <a
@@ -17,7 +14,7 @@ export default function Topbar() {
       >
         Buy $ctS
       </a>
-      <DynamicWalletButton />
+      <WalletButton />
     </div>
   );
 }

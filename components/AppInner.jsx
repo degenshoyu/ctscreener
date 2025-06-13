@@ -1,5 +1,7 @@
 // components/AppInner.jsx
+
 import { PrivyProvider } from "@privy-io/react-auth";
+import { toSolanaWalletConnectors } from "@privy-io/react-auth/solana";
 
 const PRIVY_APP_ID = "cmbunw3nq009gjr0m3z2c1sfi";
 
@@ -10,19 +12,16 @@ export default function AppInner({ Component, pageProps }) {
       config={{
         loginMethods: ["wallet", "email"],
         appearance: {
-          theme: "light",
+          theme: "dark",
           accentColor: "#6366F1",
+          walletChainType: "solana-only",
           walletList: ["phantom", "solflare", "backpack", "detected_solana_wallets"],
         },
-        embeddedWallets: {
-          solana: true,
-        },
-        walletConnectors: [
-          {
-            provider: "phantom",
-            chains: ["solana"],
+        externalWallets: {
+          solana: {
+            connectors: toSolanaWalletConnectors(),
           },
-        ],
+        },
       }}
     >
       <Component {...pageProps} />
