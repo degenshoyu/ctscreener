@@ -20,6 +20,7 @@ export default function TweetList({ tweets }) {
     }
   }, [tweets]);
   console.log("🐦 TweetList received tweets:", tweets);
+
   if (!tweets || tweets.length === 0) {
     return <p className="text-zinc-400 text-sm">No tweets found.</p>;
   }
@@ -30,7 +31,7 @@ export default function TweetList({ tweets }) {
 
   return (
     <div className="grid gap-6 mt-6">
-      {tweets.map((tweet) => (
+      {sortedTweets.map((tweet) => (
         <Card key={tweet.tweetId} className="rounded-2xl border border-zinc-800 bg-sidebar shadow-md transition-all duration-300 hover:shadow-lg hover:border-zinc-700">
           <CardContent className="p-5 space-y-3">
             <blockquote className="twitter-tweet" data-theme="dark">

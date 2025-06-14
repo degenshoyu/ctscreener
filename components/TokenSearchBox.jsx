@@ -22,8 +22,14 @@ export default function TokenSearchBox({ address, setAddress, isLoading, setIsLo
       console.log("🔁 Job polling result:", jobJson);
 
       if (jobJson.status === "completed" && Array.isArray(jobJson.tweets)) {
-        setEarliestTweets(jobJson.tweets.slice(0, 5));
-        onTweets(jobJson.tweets.slice(0, 5));
+        const sorted = [...jobJson.tweets].sort(
+          (a, b) => new Date(a.datetime) - new Date(b.datetime)
+        );
+        const earliestFive = sorted.slice(0, 5);
+
+        setEarliestTweets(earliestFive);
+        onTweets(earliestFive);
+
         console.log("✅ Fetched earliest tweets:", jobJson.tweets.slice(0, 5));
         onSearch(false);
       } else if (jobJson.status === "processing") {
