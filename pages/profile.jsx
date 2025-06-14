@@ -5,19 +5,21 @@ import DashboardLayout from "@/components/DashboardLayout";
 import Topbar from "@/components/Topbar";
 import { usePrivy } from "@privy-io/react-auth";
 import { useState, useEffect } from "react"
+import { useToast } from "@/hooks/use-toast";
 
 export default function ProfilePage() {
   const { user, authenticated } = usePrivy();
+  const { toast } = useToast();
   const walletAddress = user?.wallet?.address;
 
   const shorten = (addr) => addr?.slice(0, 5) + "..." + addr?.slice(-4);
 
   const avatarStyles = ["bottts", "adventurer", "pixel-art", "identicon"];
   const [selectedStyle, setSelectedStyle] = useState(avatarStyles[0]);
-
-  const [username, setUsername] = useState(shorten(walletAddress));
-
-  const dicebearAvatar = `https://api.dicebear.com/7.x/${selectedStyle}/svg?seed=${walletAddress}`;
+  const [username, setUsername] = useState("");
+  const dicebearAvatar = selectedStyle
+    ? `https://api.dicebear.com/7.x/${selectedStyle}/svg?seed=${walletAddress}`
+    : "";
 
   const handleSave = async () => {
     const res = await fetch("/api/user/update", {
@@ -31,9 +33,16 @@ export default function ProfilePage() {
     });
 
     if (res.ok) {
-      alert("Profile saved!");
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been saved successfully.",
+      });
     } else {
-      alert("Error saving profile");
+      toast({
+        title: "Error",
+        description: "Failed to save profile.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -42,8 +51,8 @@ export default function ProfilePage() {
     fetch(`/api/user/get?wallet=${walletAddress}`)
       .then((res) => res.json())
       .then((data) => {
-        setUsername(data.username);
-        setSelectedStyle(data.avatarStyle);
+        setUsername(data.username || shorten(walletAddress));
+        setSelectedStyle(data.avatarStyle || "bottts");
       });
   }
 }, [authenticated, walletAddress]);
@@ -56,33 +65,34 @@ export default function ProfilePage() {
       <div className="text-white px-4 py-8">
         <Topbar />
 
-        <h1 className="text-3xl font-bold mb-4">Profile</h1>
+    <div className="mt-10 max-w-lg">
+        <h1 className="text-3xl font-bold mb-8">Profile</h1>
 
         {authenticated && user ? (
           <>
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-8 mb-6">
             <img
               src={dicebearAvatar}
               alt="User Avatar"
-              className="w-20 h-20 rounded-full border border-gray-600"
+              className="w-24 h-24 rounded-full border border-gray-600"
             />
-            <div>
+            <div className="flex flex-col space-y-3">
               <input
-                className="bg-gray-900 text-white px-4 py-2 rounded border border-gray-700"
+                className="bg-gray-900 text-white px-4 py-2 rounded border border-gray-700 w-full"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
-              <p className="text-gray-400 mt-2">Wallet: {walletAddress}</p>
+              <p className="text-gray-400 text-sm break-all">Wallet: {walletAddress}</p>
             </div>
           </div>
 
-            <h2 className="text-xl font-semibold mb-2">Select Avatar Style</h2>
-            <div className="flex space-x-4 mb-6">
+            <h2 className="text-xl font-semibold mb-3">Select Avatar Style</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
               {avatarStyles.map((style) => (
                 <button
                   key={style}
                   onClick={() => setSelectedStyle(style)}
-                  className={`px-4 py-2 rounded-lg border ${
+                  className={`px-4 py-2 rounded-lg border text-sm ${
                     selectedStyle === style
                       ? "bg-purple-600 border-purple-400"
                       : "bg-gray-800 border-gray-600"
@@ -95,7 +105,7 @@ export default function ProfilePage() {
 
             <button
               onClick={handleSave}
-              className="px-6 py-2 bg-purple-600 rounded text-white hover:bg-purple-700 transition-colors"
+              className="px-8 py-3 bg-purple-600 rounded-lg text-white hover:bg-purple-700 transition-colors"
             >
               Save
             </button>
@@ -104,7 +114,7 @@ export default function ProfilePage() {
           <p className="text-gray-400">Please log in to view your profile.</p>
         )}
       </div>
-
+    </div>
     </DashboardLayout>
   );
 }

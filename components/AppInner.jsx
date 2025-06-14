@@ -2,6 +2,7 @@
 
 import { PrivyProvider } from "@privy-io/react-auth";
 import { toSolanaWalletConnectors } from "@privy-io/react-auth/solana";
+import { Toaster } from "@/components/ui/toaster";
 
 const PRIVY_APP_ID = "cmbunw3nq009gjr0m3z2c1sfi";
 
@@ -25,6 +26,7 @@ export default function AppInner({ Component, pageProps }) {
       }}
     >
       <Component {...pageProps} />
+      <Toaster />
     </PrivyProvider>
   );
 }

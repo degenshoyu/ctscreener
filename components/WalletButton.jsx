@@ -1,7 +1,7 @@
 import { useConnectWallet } from "@privy-io/react-auth";
 import { useSolanaWallets } from "@privy-io/react-auth/solana";
 import { usePrivy } from "@privy-io/react-auth";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 import { useRouter } from "next/router";
 
@@ -10,7 +10,21 @@ export default function WalletButton() {
   const { wallets } = useSolanaWallets();
   const { authenticated, user, logout } = usePrivy();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [avatarStyle, setAvatarStyle] = useState("bottts");
   const router = useRouter();
+
+
+  const address = user?.wallet?.address;
+
+  useEffect(() => {
+    if (address) {
+      fetch(`/api/user/get?wallet=${address}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setAvatarStyle(data.avatarStyle || "bottts");
+        });
+    }
+  }, [authenticated, address]);
 
   const handleLogin = async () => {
     await connectWallet({
@@ -30,13 +44,19 @@ export default function WalletButton() {
   const shorten = (addr) => addr.slice(0, 5) + "..." + addr.slice(-4);
 
   if (authenticated) {
-    const address = user?.wallet?.address;
-      return (
+    const dicebearAvatar = `https://api.dicebear.com/7.x/${avatarStyle}/svg?seed=${address}`;
+
+    return (
       <div className="relative">
         <button
           onClick={() => setDropdownOpen((o) => !o)}
           className="px-4 py-2 rounded bg-white/5 text-white hover:bg-white/10 border border-white/20 flex items-center gap-1 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500"
         >
+        <img
+          src={dicebearAvatar}
+          alt="Avatar"
+          className="w-6 h-6 rounded-full border border-white/20"
+        />
           {shorten(address)}
           <ChevronDown className="w-4 h-4" />
         </button>
