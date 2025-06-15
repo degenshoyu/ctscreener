@@ -8,7 +8,7 @@ import { useState, useEffect } from "react"
 import { useToast } from "@/hooks/use-toast";
 import TokenInfoCard from "@/components/TokenInfoCard";
 import TweetList from "@/components/TweetList";
-import { Trash } from "lucide-react";
+import { Trash, Wallet } from "lucide-react";
 
 export default function ProfilePage() {
   const { user, authenticated } = usePrivy();
@@ -128,7 +128,7 @@ export default function ProfilePage() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
-            <p className="text-gray-400 text-sm break-all">Wallet: {walletAddress}</p>
+            <p className="text-gray-400 text-sm break-all flex items-center gap-1"><Wallet size={14} className="inline-block" /> {walletAddress}</p>
           </div>
         </div>
       </div>
