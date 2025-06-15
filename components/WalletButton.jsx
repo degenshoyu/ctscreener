@@ -4,6 +4,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useState, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 import { useRouter } from "next/router";
+import { PiggyBank } from "lucide-react";
 
 export default function WalletButton() {
   const { connectWallet } = useConnectWallet();
@@ -12,7 +13,7 @@ export default function WalletButton() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [avatarStyle, setAvatarStyle] = useState("bottts");
   const router = useRouter();
-
+  const [ctsBalance, setCtsBalance] = useState(0);
 
   const address = user?.wallet?.address;
 
@@ -23,6 +24,11 @@ export default function WalletButton() {
         .then((data) => {
           setAvatarStyle(data.avatarStyle || "bottts");
         });
+      fetch(`/api/checkBalance?wallet=${address}`)
+        .then((res) => res.json())
+        .then((data) => {
+          setCtsBalance(data.balance || 0);
+      });
     }
   }, [authenticated, address]);
 
@@ -62,6 +68,9 @@ export default function WalletButton() {
         </button>
         {dropdownOpen && (
           <div className="absolute right-0 mt-2 bg-gray-800 text-white rounded shadow-lg w-32 z-50 border border-gray-700">
+            <div className="px-4 py-2 text-sm text-purple-400 border-b border-gray-700">
+              {Math.floor(ctsBalance).toLocaleString()} $ctS
+            </div>
            <button
               className="w-full px-4 py-2 hover:bg-gray-700 rounded text-left transition-colors"
               onClick={() => {

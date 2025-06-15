@@ -4,11 +4,13 @@ import Head from "next/head";
 import DashboardLayout from "@/components/DashboardLayout";
 import Topbar from "@/components/Topbar";
 import { usePrivy } from "@privy-io/react-auth";
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useToast } from "@/hooks/use-toast";
 import TokenInfoCard from "@/components/TokenInfoCard";
 import TweetList from "@/components/TweetList";
 import { Trash, Wallet, Save as SaveIcon, ArrowRight } from "lucide-react";
+import * as Select from "@radix-ui/react-select";
+import { ChevronDownIcon } from "@radix-ui/react-icons";
 
 export default function ProfilePage() {
   const { user, authenticated } = usePrivy();
@@ -19,6 +21,30 @@ export default function ProfilePage() {
   const [retriveJobId, setRetriveJobId] = useState(null);
   const [retriveData, setRetriveData] = useState({ tokenInfo: null, tweets: [] });
   const [showAvatarOptions, setShowAvatarOptions] = useState(false);
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const [sortKey, setSortKey] = useState("likes");
+  const sortOptions = [
+    { value: "newest", label: "Newest" },
+    { value: "earliest", label: "Earliest" },
+    { value: "views", label: "Most Views" },
+    { value: "retweets", label: "Most Retweets" },
+    { value: "likes", label: "Most Likes" },
+    { value: "replies", label: "Most Replies" },
+  ];
+  const sortedPagedTweets = useMemo(() => {
+    return [...retriveData.tweets]
+      .sort((a, b) => {
+        if (sortKey === "newest") return new Date(b.datetime) - new Date(a.datetime);
+        if (sortKey === "earliest") return new Date(a.datetime) - new Date(b.datetime);
+        if (sortKey === "views") return (b.views || 0) - (a.views || 0);
+        if (sortKey === "retweets") return (b.retweets || 0) - (a.retweets || 0);
+        if (sortKey === "likes") return (b.likes || 0) - (a.likes || 0);
+        if (sortKey === "replies") return (b.replies || 0) - (a.replies || 0);
+        return 0;
+      })
+      .slice((page - 1) * pageSize, page * pageSize);
+    }, [retriveData.tweets, sortKey, page]);
 
   const shorten = (addr) => addr?.slice(0, 5) + "..." + addr?.slice(-4);
 
@@ -124,7 +150,7 @@ export default function ProfilePage() {
               />
           <div className="flex-1 space-y-2">
             <input
-              className="bg-gray-800 text-white px-4 py-2 rounded border border-gray-700 w-full  w-[240px]"
+              className="bg-gray-800 text-white px-4 py-2 rounded border border-gray-700 w-full"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
@@ -159,6 +185,9 @@ export default function ProfilePage() {
                 <div>
                   <div className="font-semibold">
                     {h.token_info?.name || "Unknown"} ({h.token_info?.symbol || ""})
+                  <span className="ml-2 px-2 py-0.5 rounded bg-gray-700 text-xs">
+                    {h.mode === "shiller" ? `Top shillers (${h.window})` : "Early callers"}
+                  </span>
                   </div>
                   <div className="text-xs text-gray-400">
                     {h.token_address.slice(0, 4)}...{h.token_address.slice(-4)}
@@ -278,8 +307,55 @@ export default function ProfilePage() {
 
       {retriveData.tweets.length > 0 ? (
         <div>
-          <h2 className="text-lg font-semibold mb-2">Tweets</h2>
-          <TweetList tweets={retriveData.tweets} />
+        <>
+  <div className="flex items-center justify-between mb-4">
+    <h2 className="text-lg font-semibold">Tweets</h2>
+     <Select.Root value={sortKey} onValueChange={(value) => { setSortKey(value); setPage(1); }}>
+    <Select.Trigger className="inline-flex items-center justify-between px-2 py-1 rounded bg-gray-800 text-white text-sm border border-gray-600">
+      <Select.Value />
+      <Select.Icon className="ml-1">
+        <ChevronDownIcon />
+      </Select.Icon>
+    </Select.Trigger>
+    <Select.Content
+      sideOffset={4}
+      className="z-50 bg-[#202232] text-white text-sm border border-[#414670] rounded shadow"
+    >
+      <Select.Viewport className="p-1">
+        {sortOptions.map(option => (
+          <Select.Item
+            key={option.value}
+            value={option.value}
+            className="px-3 py-1 rounded hover:bg-gray-700 cursor-pointer"
+          >
+            <Select.ItemText>{option.label}</Select.ItemText>
+          </Select.Item>
+        ))}
+      </Select.Viewport>
+    </Select.Content>
+  </Select.Root>
+  </div>
+
+  <TweetList tweets={sortedPagedTweets} />
+
+  <div className="flex justify-end gap-2 mt-4">
+    <button
+      onClick={() => setPage(p => Math.max(1, p - 1))}
+      disabled={page === 1}
+      className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
+    >
+      Prev
+    </button>
+    <button
+      onClick={() => setPage(p => p + 1)}
+      disabled={page * pageSize >= retriveData.tweets.length}
+      className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
+    >
+      Next
+    </button>
+  </div>
+</>
+
         </div>
       ) : (
         <p className="text-gray-400">Loading tweets...</p>

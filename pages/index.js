@@ -14,14 +14,17 @@ import TokenSearchBox from "@/components/TokenSearchBox";
 import TokenInfoCard from "@/components/TokenInfoCard";
 import TweetList from "@/components/TweetList";
 import { usePrivy } from "@privy-io/react-auth";
+import * as Select from "@radix-ui/react-select";
+import { ChevronDownIcon } from "@radix-ui/react-icons";
 
 export default function HomePage() {
   const { user } = usePrivy();
   const walletAddress = user?.wallet?.address;
-  
+
   const [earliestTweets, setEarliestTweets] = useState([]);
   const [address, setAddress] = useState("");
   const [activeTab, setActiveTab] = useState("earliest");
+  const [shillerWindow, setShillerWindow] = useState("24h");
   const [isLoading, setIsLoading] = useState(false);
   const [tokenInfo, setTokenInfo] = useState(null);
   const [tweets, setTweets] = useState([]);
@@ -48,7 +51,7 @@ export default function HomePage() {
         <Topbar />
         <h1 className="text-3xl font-bold mb-2">Coin Analyst</h1>
         <p className="text-gray-400 mb-6">
-          Discover early callers of winning coins.
+          Discover early callers of winning coins on X.
         </p>
 
         <div className="flex items-center gap-4 max-w-xl">
@@ -62,6 +65,8 @@ export default function HomePage() {
             onTweets={setTweets}
             onSearch={setScanningTweets}
             onTweetCount={setTweetCount}
+            activeTab={activeTab}
+            shillerWindow={shillerWindow}
           />
         </div>
 
@@ -69,7 +74,7 @@ export default function HomePage() {
           <RadioGroup
             value={activeTab}
             onValueChange={(val) => setActiveTab(val)}
-            className="flex gap-6"
+            className="flex items-center gap-8"
           >
             <TooltipProvider>
               <div className="flex items-center space-x-2">
@@ -79,22 +84,50 @@ export default function HomePage() {
                 </label>
               </div>
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="shiller" id="r2" disabled />
-                    <label htmlFor="r2" className="text-sm text-gray-500">
-                      Top shillers (24h / 7d / 30d)
-                    </label>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="top"
-                  className="text-sm font-semibold bg-yellow-500 text-black px-3 py-2 rounded-md shadow-lg"
-                >
-                  🚧 Coming soon
-                </TooltipContent>
-              </Tooltip>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="shiller" id="r2" />
+                <label htmlFor="r2" className="text-sm text-gray-300">
+                  Top shillers
+                </label>
+
+                {activeTab === "shiller" && (
+                  <Select.Root
+                    value={shillerWindow}
+                    onValueChange={setShillerWindow}
+                  >
+                    <Select.Trigger className="inline-flex items-center justify-between px-2 py-1 rounded bg-gray-800 text-white text-sm border border-gray-600">
+                      <Select.Value />
+                      <Select.Icon className="ml-1">
+                        <ChevronDownIcon />
+                      </Select.Icon>
+                    </Select.Trigger>
+
+                    <Select.Content className="bg-gray-800 text-white text-sm border border-gray-600 rounded shadow">
+                      <Select.Viewport className="p-1">
+                        <Select.Item
+                          value="24h"
+                          className="px-3 py-1 rounded hover:bg-gray-700 cursor-pointer"
+                        >
+                          <Select.ItemText>Last 24h</Select.ItemText>
+                        </Select.Item>
+                        <Select.Item
+                          value="7d"
+                          className="px-3 py-1 rounded hover:bg-gray-700 cursor-pointer"
+                        >
+                          <Select.ItemText>Last 7d</Select.ItemText>
+                        </Select.Item>
+                        <Select.Item
+                          value="30d"
+                          className="px-3 py-1 rounded cursor-pointer data-[disabled]:cursor-not-allowed data-[disabled]:hover:bg-transparent hover:bg-gray-700"
+                          disabled
+                        >
+                          <Select.ItemText>Last 30d</Select.ItemText>
+                        </Select.Item>
+                      </Select.Viewport>
+                    </Select.Content>
+                  </Select.Root>
+                )}
+              </div>
 
               <Tooltip>
                 <TooltipTrigger asChild>

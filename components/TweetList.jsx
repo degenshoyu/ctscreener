@@ -25,13 +25,9 @@ export default function TweetList({ tweets }) {
     return <p className="text-zinc-400 text-sm">No tweets found.</p>;
   }
 
-  const sortedTweets = [...tweets].sort(
-    (a, b) => new Date(a.datetime) - new Date(b.datetime)
-  );
-
   return (
     <div className="grid gap-6 mt-6">
-      {sortedTweets.map((tweet) => (
+      {tweets.map((tweet) => (
         <Card key={tweet.tweetId} className="rounded-2xl border border-zinc-800 bg-sidebar shadow-md transition-all duration-300 hover:shadow-lg hover:border-sidebarBorder">
           <CardContent className="p-5 space-y-3">
             <blockquote className="twitter-tweet" data-theme="dark">
