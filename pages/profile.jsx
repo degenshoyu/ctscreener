@@ -18,6 +18,7 @@ export default function ProfilePage() {
   const [showPopup, setShowPopup] = useState(false);
   const [retriveJobId, setRetriveJobId] = useState(null);
   const [retriveData, setRetriveData] = useState({ tokenInfo: null, tweets: [] });
+  const [showAvatarOptions, setShowAvatarOptions] = useState(false);
 
   const shorten = (addr) => addr?.slice(0, 5) + "..." + addr?.slice(-4);
 
@@ -107,137 +108,143 @@ export default function ProfilePage() {
       <div className="text-white px-4 py-8">
         <Topbar />
 
-    <div className="mt-10 max-w-lg">
-        <h1 className="text-3xl font-bold mb-8">Profile</h1>
+      <div className="max-w-4l mx-auto space-y-6">
+        <h1 className="text-3xl font-bold">Profile</h1>
 
         {authenticated && user ? (
-          <>
-          <div className="flex items-center space-x-8 mb-6">
-            <img
-              src={dicebearAvatar}
-              alt="User Avatar"
-              className="w-24 h-24 rounded-full border border-gray-600"
-            />
-            <div className="flex flex-col space-y-3">
-              <input
-                className="bg-gray-900 text-white px-4 py-2 rounded border border-gray-700 w-full"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+        <>
+          {/* === Profile Card === */}
+          <div className="bg-sidebar p-6 rounded-lg w-full">
+            <div className="flex items-center space-x-6">
+              <img
+                src={dicebearAvatar}
+                alt="User Avatar"
+                className="w-24 h-24 rounded-full border border-gray-600 cursor-pointer hover:opacity-80"
+                onClick={() => setShowAvatarOptions(true)}
               />
-              <p className="text-gray-400 text-sm break-all">Wallet: {walletAddress}</p>
-            </div>
-          </div>
-
-            <h2 className="text-xl font-semibold mb-3">Select Avatar Style</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-              {avatarStyles.map((style) => (
-                <button
-                  key={style}
-                  onClick={() => setSelectedStyle(style)}
-                  className={`px-4 py-2 rounded-lg border text-sm ${
-                    selectedStyle === style
-                      ? "bg-purple-600 border-purple-400"
-                      : "bg-gray-800 border-gray-600"
-                  } hover:bg-purple-700 transition-colors`}
-                >
-                  {style}
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={handleSave}
-              className="px-8 py-3 bg-purple-600 rounded-lg text-white hover:bg-purple-700 transition-colors"
-            >
-              Save
-            </button>
-            <h2 className="text-xl font-semibold mt-10 mb-4">Search History</h2>
-              {history.length > 0 ? (
-                <ul className="space-y-3">
-                  {history.map((h) => (
-                    <li key={h._id} className="flex justify-between items-center text-sm text-gray-300 border-b border-gray-700 pb-2">
-
-                    <div>
-                      <div className="font-semibold">
-                        {h.token_info?.name || "Unknown"} ({h.token_info?.symbol || ""})
-                      </div>
-                      <div className="text-xs text-gray-400">
-                        {h.token_address.slice(0, 4)}...{h.token_address.slice(-4)}
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end text-xs text-gray-400">
-                      <div className="flex items-center space-x-2">  
-                      <button
-                        onClick={() => {
-                          setRetriveJobId(h.job_id);
-                          setShowPopup(true);
-                          pollJobResult(h.job_id);
-                        }}
-                        className="text-blue-400 hover:underline text-xs"
-                      >
-                        Retrieve
-                      </button>
-
-                      <button
-                        onClick={async () => {
-                          await fetch(`/api/user/deleteHistory?job_id=${h.job_id}`, {
-                            method: "DELETE",
-                          });
-                          setHistory(history.filter(item => item.job_id !== h.job_id));
-                        }}
-                        className="text-red-400 hover:text-red-600"
-                        aria-label="Delete"
-                      >
-                        <Trash size={16} />
-                      </button>
-                      </div>
-                      <span>
-                        {h.created_at
-                          ? new Date(h.created_at).toLocaleString()
-                          : "Unknown"}
-                      </span>
-                    </div>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-gray-400 text-sm">No search history found.</p>
-              )}
-          </>
-        ) : (
-          <p className="text-gray-400">Please log in to view your profile.</p>
-        )}
-      </div>
-
-      {showPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-[#202232] border border-[#414670] rounded-lg p-6 max-w-xl w-full max-h-[90vh] overflow-y-auto">
-              <button
-                className="text-right text-gray-400 mb-4 float-right"
-                onClick={() => setShowPopup(false)}
-              >
-                ✕ Close
-              </button>
-
-              {retriveData.tokenInfo && (
-                <div className="mb-6">
-                  <h2 className="text-lg font-semibold mb-2">Token Info</h2>
-                  <TokenInfoCard tokenInfo={retriveData.tokenInfo} />
-                </div>
-              )}
-
-              {retriveData.tweets.length > 0 ? (
-              <div>
-                <h2 className="text-lg font-semibold mb-2">Tweets</h2>
-                <TweetList tweets={retriveData.tweets} />
-              </div>
-            ) : (
-              <p className="text-gray-400">Loading tweets...</p>
-            )}
+          <div className="flex-1 space-y-2">
+            <input
+              className="bg-gray-800 text-white px-4 py-2 rounded border border-gray-700 w-full  w-[240px]"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <p className="text-gray-400 text-sm break-all">Wallet: {walletAddress}</p>
           </div>
         </div>
-    )}
+      </div>
 
+      {/* === Search History Card === */}
+      <div className="bg-sidebar p-6 rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Search History</h2>
+        {history.length > 0 ? (
+          <ul className="space-y-3">
+            {history.map((h) => (
+              <li
+                key={h._id}
+                className="flex justify-between items-center text-sm text-gray-300 border-b border-gray-700 pb-2"
+              >
+                <div>
+                  <div className="font-semibold">
+                    {h.token_info?.name || "Unknown"} ({h.token_info?.symbol || ""})
+                  </div>
+                  <div className="text-xs text-gray-400">
+                    {h.token_address.slice(0, 4)}...{h.token_address.slice(-4)}
+                  </div>
+                </div>
+                <div className="flex flex-col items-end text-xs text-gray-400">
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => {
+                        setRetriveJobId(h.job_id);
+                        setShowPopup(true);
+                        pollJobResult(h.job_id);
+                      }}
+                      className="text-blue-400 hover:underline text-xs"
+                    >
+                      Retrieve
+                    </button>
+
+                    <button
+                      onClick={async () => {
+                        await fetch(`/api/user/deleteHistory?job_id=${h.job_id}`, {
+                          method: "DELETE",
+                        });
+                        setHistory(history.filter(item => item.job_id !== h.job_id));
+                      }}
+                      className="text-red-400 hover:text-red-600"
+                      aria-label="Delete"
+                    >
+                      <Trash size={16} />
+                    </button>
+                  </div>
+                  <span>
+                    {h.created_at
+                      ? new Date(h.created_at).toLocaleString()
+                      : "Unknown"}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-gray-400 text-sm">No search history found.</p>
+        )}
+      </div>
+    </>
+  ) : (
+    <p className="text-gray-400">Please log in to view your profile.</p>
+  )}
+    {showAvatarOptions && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div className="bg-[#202232] p-6 rounded-lg max-w-sm w-full">
+      <h2 className="text-lg font-semibold mb-4 text-white text-center">Select an Avatar</h2>
+        <div
+          className={`grid ${
+            avatarStyles.length <= 2
+              ? 'grid-cols-2'
+              : avatarStyles.length <= 4
+              ? 'grid-cols-2'
+              : 'grid-cols-3'
+          } gap-4`}
+        >
+        {avatarStyles.map((style) => (
+          <div key={style} className="flex justify-center items-center">
+          <img
+            key={style}
+            src={`https://api.dicebear.com/7.x/${style}/svg?seed=${walletAddress}`}
+            alt={style}
+            className={`w-20 h-20 rounded-full border-2 ${
+              selectedStyle === style ? "border-purple-500" : "border-transparent"
+            } cursor-pointer hover:opacity-80`}
+            onClick={() => {
+              setSelectedStyle(style);
+            }}
+          />
+          </div>
+        ))}
+      </div>
+      <div className="mt-6 flex justify-end space-x-3">
+        <button
+          onClick={() => setShowAvatarOptions(false)}
+          className="px-4 py-1.5 bg-gray-700 text-white rounded hover:bg-gray-600 text-sm"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={async () => {
+            await handleSave();
+            setShowAvatarOptions(false);
+          }}
+          className="px-4 py-1.5 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+</div>
     </div>
     </DashboardLayout>
   );
