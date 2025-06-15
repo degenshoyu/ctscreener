@@ -22,14 +22,17 @@ export default function TokenInfoCard({ tokenInfo }) {
     imageUrl,
   } = tokenInfo;
 
-  const formatUsd = (n) =>
-    n ? `$${Number(n).toLocaleString(undefined, { maximumFractionDigits: 2 })}` : "-";
+  const formatUsd = (n) => {
+    if (!n) return "-";
+    const num = Math.max(Number(n), 0.000001);
+    return `$${num.toLocaleString(undefined, { maximumFractionDigits: 6 })}`;
+  };
 
   const formatChange = (n) => (n > 0 ? `+${n}%` : `${n}%`);
 
   return (
-    <Card className="mt-6 bg-[#202232] border border-[#414670]">
-      <CardContent className="p-6 flex flex-col gap-4">
+    <Card className="rounded-2xl border border-zinc-800 bg-sidebar shadow-md transition-all duration-300 hover:shadow-lg hover:border-sidebarBorder">
+      <CardContent className="p-5 space-y-3">
         {/* Header */}
         <div className="flex items-center gap-4">
           {imageUrl && (
@@ -74,4 +77,3 @@ export default function TokenInfoCard({ tokenInfo }) {
     </Card>
   );
 }
-

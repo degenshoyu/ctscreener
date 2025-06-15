@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
-export default function TokenSearchBox({ address, setAddress, isLoading, setIsLoading, onTokenInfo, onTweets, onSearch,onTweetCount }) {
+export default function TokenSearchBox({ address, setAddress, walletAddress, isLoading, setIsLoading, onTokenInfo, onTweets, onSearch,onTweetCount }) {
   console.log("🧩 TokenSearchBox mounted");
   const [error, setError] = useState("");
   const [earliestTweets, setEarliestTweets] = useState([]);
@@ -121,12 +121,19 @@ export default function TokenSearchBox({ address, setAddress, isLoading, setIsLo
       });
 
       console.log("📨 Triggering Twitter search...");
+
+      console.log("Using walletAddress:", walletAddress);
+
       const twitterRes = await fetch("/api/twitterSearch", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-wallet-address": walletAddress,
+        },
         body: JSON.stringify({
           tokenAddress: token.address,
           pairCreatedAt: match.pairCreatedAt,
+          tokenInfo
         }),
       });
 

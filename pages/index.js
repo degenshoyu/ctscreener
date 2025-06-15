@@ -13,8 +13,12 @@ import Topbar from "@/components/Topbar";
 import TokenSearchBox from "@/components/TokenSearchBox";
 import TokenInfoCard from "@/components/TokenInfoCard";
 import TweetList from "@/components/TweetList";
+import { usePrivy } from "@privy-io/react-auth";
 
 export default function HomePage() {
+  const { user } = usePrivy();
+  const walletAddress = user?.wallet?.address;
+  
   const [earliestTweets, setEarliestTweets] = useState([]);
   const [address, setAddress] = useState("");
   const [activeTab, setActiveTab] = useState("earliest");
@@ -51,6 +55,7 @@ export default function HomePage() {
           <TokenSearchBox
             address={address}
             setAddress={setAddress}
+            walletAddress={walletAddress}
             onTokenInfo={setTokenInfo}
             isLoading={isLoading}
             setIsLoading={setIsLoading}

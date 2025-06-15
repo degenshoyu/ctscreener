@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).end();
 
   try {
-    const { info } = req.body;
+    const info = req.body;
 
     console.log("💾 [API] saveTokenInfo called with:", {
       address: info?.address,
@@ -18,11 +18,10 @@ export default async function handler(req, res) {
     const client = await clientPromise;
     const db = client.db();
 
-
     await db
       .collection("tokens")
       .updateOne(
-        { "address": info.address },
+        { address: info.address },
         { $set: { ...info, savedAt: new Date() } },
         { upsert: true },
       );

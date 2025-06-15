@@ -1,4 +1,5 @@
 // pages/api/twitterSearch.js
+import clientPromise from "@/lib/mongodb";
 
 const BASE_URL = process.env.TWITTER_SCANNER_API_URL;
 
@@ -10,7 +11,7 @@ export default async function handler(req, res) {
 
   if (req.method !== "POST") return res.status(405).end();
 
-  const { tokenAddress, pairCreatedAt } = req.body;
+  const { tokenAddress, pairCreatedAt, tokenInfo } = req.body;
   const bearerToken = process.env.TWITTER_SCANNER_SECRET;
   console.log("📥 Received params:", { tokenAddress, pairCreatedAt });
 
@@ -22,7 +23,13 @@ export default async function handler(req, res) {
     const recentJob = await getLatestCompletedJobByKeyword(tokenAddress);
     if (recentJob && recentJob.job_id) {
       console.log("♻️ Using cached job_id:", recentJob.job_id);
-      return res.status(200).json({ job_id: recentJob.job_id, reused: true });
+      return res
+        .status(200)
+        .json({
+          job_id: recentJob.job_id,
+          reused: true,
+          token_info: recentJob.token_info || null,
+        });
     }
   }
 
@@ -52,6 +59,21 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: "Scanner error", data });
 
     console.log("✅ Scanner job_id:", data.job_id);
+
+    try {
+      const client = await clientPromise;
+      const db = client.db();
+      await db.collection("search_history").insertOne({
+        wallet_address: req.headers["x-wallet-address"] || null,
+        token_address: tokenAddress,
+        token_info: tokenInfo || null,
+        job_id: data.job_id,
+        created_at: new Date(),
+      });
+    } catch (err) {
+      console.error("❌ Failed to save search history:", err);
+    }
+
     res.status(200).json({ job_id: data.job_id });
   } catch (err) {
     console.error(err);

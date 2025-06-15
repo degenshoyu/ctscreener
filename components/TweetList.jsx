@@ -32,7 +32,7 @@ export default function TweetList({ tweets }) {
   return (
     <div className="grid gap-6 mt-6">
       {sortedTweets.map((tweet) => (
-        <Card key={tweet.tweetId} className="rounded-2xl border border-zinc-800 bg-sidebar shadow-md transition-all duration-300 hover:shadow-lg hover:border-zinc-700">
+        <Card key={tweet.tweetId} className="rounded-2xl border border-zinc-800 bg-sidebar shadow-md transition-all duration-300 hover:shadow-lg hover:border-sidebarBorder">
           <CardContent className="p-5 space-y-3">
             <blockquote className="twitter-tweet" data-theme="dark">
               <a href={`https://twitter.com/${tweet.tweeter}/status/${tweet.tweetId}`} />
