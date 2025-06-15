@@ -11,6 +11,17 @@ export default function TokenSearchBox({ address, setAddress, walletAddress, isL
   const { toast } = useToast();
   const [isSearching, setIsSearching] = useState(false);
 
+  useEffect(() => {
+    if (activeTab === "shiller" && !walletAddress) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet and hold at least 10,000 $ctS to use Top Shillers.",
+        variant: "destructive",
+        duration: 999999,
+      });
+    }
+  }, [activeTab, walletAddress]);
+
   const pollJobResult = async (jobId, retries = 1500) => {
     if (retries <= 0) {
       console.warn("🛑 Max retries reached.");
@@ -76,6 +87,16 @@ export default function TokenSearchBox({ address, setAddress, walletAddress, isL
 
     if (isSearching) {
       console.log("⏳ Already loading, skip click");
+      return;
+    }
+
+    if (activeTab === "shiller" && !walletAddress) {
+      toast({
+        title: "Wallet Required",
+        description: "Please connect your wallet and hold at least 10,000 $ctS to use Top Shillers.",
+        variant: "destructive",
+        duration: 999999,
+      });
       return;
     }
 
@@ -240,7 +261,10 @@ export default function TokenSearchBox({ address, setAddress, walletAddress, isL
           console.log("🖱️ Button clicked");
           handleSearch();
         }}
-        disabled={isSearching || !address.trim()}
+        disabled={
+          isSearching || !address.trim() ||
+          (activeTab === "shiller" && !walletAddress)
+        }
         className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
       >
         {isSearching ? "Searching..." : "Search"}
