@@ -8,7 +8,7 @@ import { useState, useEffect } from "react"
 import { useToast } from "@/hooks/use-toast";
 import TokenInfoCard from "@/components/TokenInfoCard";
 import TweetList from "@/components/TweetList";
-import { Trash, Wallet } from "lucide-react";
+import { Trash, Wallet, Save as SaveIcon, ArrowRight } from "lucide-react";
 
 export default function ProfilePage() {
   const { user, authenticated } = usePrivy();
@@ -128,7 +128,20 @@ export default function ProfilePage() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
-            <p className="text-gray-400 text-sm break-all flex items-center gap-1"><Wallet size={14} className="inline-block" /> {walletAddress}</p>
+
+          <p className="text-gray-400 text-sm break-all flex items-center gap-1"> <Wallet size={14} className="inline-block" /> {walletAddress}
+</p>
+            <div className="pt-3">
+              <button
+                onClick={handleSave}
+                className="inline-flex items-center gap-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium px-5 py-2 transition"
+              >
+                <SaveIcon size={16} />
+                  Save Profile
+                <ArrowRight size={16} />
+              </button>
+            </div>
+
           </div>
         </div>
       </div>
@@ -194,6 +207,8 @@ export default function ProfilePage() {
   ) : (
     <p className="text-gray-400">Please log in to view your profile.</p>
   )}
+
+    {/* === Avatar Options Popup === */}
     {showAvatarOptions && (
   <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
     <div className="bg-[#202232] p-6 rounded-lg max-w-sm w-full">
@@ -243,7 +258,35 @@ export default function ProfilePage() {
     </div>
   </div>
 )}
+      {/* === Retrieve Popup === */}
+{showPopup && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div className="bg-[#202232] border border-[#414670] rounded-lg p-6 max-w-xl w-full overflow-y-auto max-h-[80vh]">
+      <button
+        className="text-right text-gray-400 mb-4 float-right"
+        onClick={() => setShowPopup(false)}
+      >
+        ✕ Close
+      </button>
 
+      {retriveData.tokenInfo && (
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold mb-2">Token Info</h2>
+          <TokenInfoCard tokenInfo={retriveData.tokenInfo} />
+        </div>
+      )}
+
+      {retriveData.tweets.length > 0 ? (
+        <div>
+          <h2 className="text-lg font-semibold mb-2">Tweets</h2>
+          <TweetList tweets={retriveData.tweets} />
+        </div>
+      ) : (
+        <p className="text-gray-400">Loading tweets...</p>
+      )}
+    </div>
+  </div>
+)}
 </div>
     </div>
     </DashboardLayout>
