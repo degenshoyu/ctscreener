@@ -21,6 +21,7 @@ export default function ProfilePage() {
   const [retriveJobId, setRetriveJobId] = useState(null);
   const [retriveData, setRetriveData] = useState({ tokenInfo: null, tweets: [] });
   const [showAvatarOptions, setShowAvatarOptions] = useState(false);
+  const [retriveViewMode, setRetriveViewMode] = useState("embed");
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const [sortKey, setSortKey] = useState("likes");
@@ -31,6 +32,7 @@ export default function ProfilePage() {
     { value: "retweets", label: "Most Retweets" },
     { value: "likes", label: "Most Likes" },
     { value: "replies", label: "Most Replies" },
+    { value: "score", label: "Highest Score" },
   ];
   const sortedPagedTweets = useMemo(() => {
     return [...retriveData.tweets]
@@ -41,6 +43,7 @@ export default function ProfilePage() {
         if (sortKey === "retweets") return (b.retweets || 0) - (a.retweets || 0);
         if (sortKey === "likes") return (b.likes || 0) - (a.likes || 0);
         if (sortKey === "replies") return (b.replies || 0) - (a.replies || 0);
+        if (sortKey === "score") return (b.score || 0) - (a.score || 0);
         return 0;
       })
       .slice((page - 1) * pageSize, page * pageSize);
@@ -290,7 +293,7 @@ export default function ProfilePage() {
       {/* === Retrieve Popup === */}
 {showPopup && (
   <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-    <div className="bg-[#202232] border border-[#414670] rounded-lg p-6 max-w-xl w-full overflow-y-auto max-h-[80vh]">
+    <div className="bg-[#202232] border border-[#414670] rounded-lg p-6 max-4-xl w-full overflow-y-auto max-h-[80vh]">
       <button
         className="text-right text-gray-400 mb-4 float-right"
         onClick={() => setShowPopup(false)}
@@ -336,7 +339,29 @@ export default function ProfilePage() {
   </Select.Root>
   </div>
 
-  <TweetList tweets={sortedPagedTweets} />
+  <div className="flex items-center gap-4 mb-4">
+    <label className="text-sm text-gray-400">View Mode:</label>
+      <button
+        onClick={() => setRetriveViewMode("embed")}
+        className={`px-3 py-1 rounded text-sm ${
+          retriveViewMode === "embed" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"
+        }`}
+      >
+      Embed
+    </button>
+    <button
+      onClick={() => setRetriveViewMode("list")}
+      className={`px-3 py-1 rounded text-sm ${
+        retriveViewMode === "list" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"
+      }`}
+    >
+    List
+    </button>
+  </div>
+
+  <div className="w-full overflow-x-auto">
+    <TweetList tweets={sortedPagedTweets} viewMode={retriveViewMode} />
+  </div>
 
   <div className="flex justify-end gap-2 mt-4">
     <button

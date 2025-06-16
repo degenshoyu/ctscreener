@@ -1,11 +1,29 @@
 // components/TweetList.jsx
-import React,{ useEffect } from "react";
+import React,{ useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MessageCircle, Repeat, Heart, BarChart } from "lucide-react";
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table";
+import * as Dialog from "@radix-ui/react-dialog";
 
-export default function TweetList({ tweets }) {
+export default function TweetList({ tweets, viewMode = "embed" }) {
+  const [popupText, setPopupText] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
+
+  const formatNumber = (num) => {
+    if (num >= 1_000_000) return (num / 1_000_000).toFixed(1).replace(/\.0$/, '') + "M";
+    if (num >= 1_000) return (num / 1_000).toFixed(1).replace(/\.0$/, '') + "K";
+    return num;
+  };
+
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (viewMode === "embed" && typeof window !== "undefined") {
       if (window.twttr && window.twttr.widgets) {
         window.twttr.widgets.load();
       } else {
@@ -18,17 +36,96 @@ export default function TweetList({ tweets }) {
         document.body.appendChild(script);
       }
     }
-  }, [tweets]);
+  }, [tweets, viewMode]);
   console.log("🐦 TweetList received tweets:", tweets);
 
   if (!tweets || tweets.length === 0) {
     return <p className="text-zinc-400 text-sm">No tweets found.</p>;
   }
 
+  if (viewMode === "list") {
+      return (
+    <div className="w-full overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Tweeter</TableHead>
+            <TableHead>Tweet ID</TableHead>
+            <TableHead>Views</TableHead>
+            <TableHead>Rtws</TableHead>
+            <TableHead>Likes</TableHead>
+            <TableHead>Replies</TableHead>
+            <TableHead>Publish Date</TableHead>
+            <TableHead>Text</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {tweets.map((tweet) => (
+            <TableRow key={tweet.tweetId} className="hover:bg-gray-800">
+              <TableCell>
+                <a
+                  href={`https://twitter.com/${tweet.tweeter}`}
+                  target="_blank"
+                  className="text-blue-400 hover:underline"
+                >
+                  {tweet.tweeter}
+                </a>
+              </TableCell>
+              <TableCell>
+                <a
+                  href={`https://twitter.com/${tweet.tweeter}/status/${tweet.tweetId}`}
+                  target="_blank"
+                  className="text-green-400 hover:underline"
+                  title={tweet.tweetId}
+                >
+                  {tweet.tweetId.slice(0, 3) + "..." + tweet.tweetId.slice(-4)}
+                </a>
+              </TableCell>
+              <TableCell>{formatNumber(tweet.views ?? 0)}</TableCell>
+              <TableCell>{formatNumber(tweet.retweets ?? 0)}</TableCell>
+              <TableCell>{formatNumber(tweet.likes ?? 0)}</TableCell>
+              <TableCell>{formatNumber(tweet.replies ?? 0)}</TableCell>
+              <TableCell>{new Date(tweet.datetime).toLocaleString()}</TableCell>
+              <TableCell>
+                <Dialog.Root>
+                  <Dialog.Trigger asChild>
+                    <button className="text-blue-400 hover:underline">
+                      View
+                    </button>
+                  </Dialog.Trigger>
+                  <Dialog.Portal>
+                    <Dialog.Overlay className="fixed inset-0 bg-black/50 z-50" />
+                    <Dialog.Content className="fixed top-1/2 left-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-lg bg-[#202232] p-6 shadow-lg">
+                      <Dialog.Title className="text-lg font-semibold mb-4 text-white">
+                        Tweet Full Text
+                      </Dialog.Title>
+                      <div className="text-gray-300 whitespace-pre-line">
+                        {tweet.textContent || "No text"}
+                      </div>
+                      <Dialog.Close asChild>
+                        <button className="mt-6 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
+                          Close
+                        </button>
+                      </Dialog.Close>
+                    </Dialog.Content>
+                  </Dialog.Portal>
+                </Dialog.Root>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+  }
+
   return (
-    <div className="grid gap-6 mt-6">
+    <div className="flex flex-col gap-6 mt-6 items-left">
       {tweets.map((tweet) => (
-        <Card key={tweet.tweetId} className="rounded-2xl border border-zinc-800 bg-sidebar shadow-md transition-all duration-300 hover:shadow-lg hover:border-sidebarBorder">
+        <Card
+          key={tweet.tweetId}
+          className="w-full max-w-xl rounded-2xl border border-zinc-800 bg-sidebar shadow-md transition-all duration-300 hover:shadow-lg hover:border-sidebarBorder"
+        >
           <CardContent className="p-5 space-y-3">
             <blockquote className="twitter-tweet" data-theme="dark">
               <a href={`https://twitter.com/${tweet.tweeter}/status/${tweet.tweetId}`} />

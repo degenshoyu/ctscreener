@@ -16,20 +16,25 @@ import TweetList from "@/components/TweetList";
 import { usePrivy } from "@privy-io/react-auth";
 import * as Select from "@radix-ui/react-select";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
+import { List, LayoutGrid } from "lucide-react";
 
 export default function HomePage() {
   const { user } = usePrivy();
   const walletAddress = user?.wallet?.address;
-
-  const [earliestTweets, setEarliestTweets] = useState([]);
   const [address, setAddress] = useState("");
+
   const [activeTab, setActiveTab] = useState("earliest");
   const [shillerWindow, setShillerWindow] = useState("24h");
   const [isLoading, setIsLoading] = useState(false);
+
   const [tokenInfo, setTokenInfo] = useState(null);
+
+  const [earliestTweets, setEarliestTweets] = useState([]);
   const [tweets, setTweets] = useState([]);
   const [scanningTweets, setScanningTweets] = useState(false);
   const [tweetCount, setTweetCount] = useState(0);
+
+  const [viewMode, setViewMode] = useState("embed");
 
   return (
     <DashboardLayout>
@@ -147,6 +152,22 @@ export default function HomePage() {
               </Tooltip>
             </TooltipProvider>
           </RadioGroup>
+
+          <div className="mt-4 flex items-center gap-4">
+            <label className="text-sm text-gray-400">View tweets as</label>
+            <button
+              onClick={() => setViewMode("embed")}
+              className={`flex items-center gap-1 text-sm px-3 py-1 rounded ${viewMode === "embed" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"}`}
+            >
+              <LayoutGrid size={16} /> Embed Card
+            </button>
+            <button
+              onClick={() => setViewMode("list")}
+              className={`flex items-center gap-1 text-sm px-3 py-1 rounded ${viewMode === "list" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"}`}
+            >
+              <List size={16} /> Tweet List
+            </button>
+          </div>
         </div>
 
         {tokenInfo && (
@@ -192,8 +213,8 @@ export default function HomePage() {
         )}
 
         {tweets.length > 0 && (
-          <div className="mt-6 max-w-xl">
-            <TweetList tweets={tweets} />
+          <div className="mt-6 max-w-full">
+            <TweetList tweets={tweets} viewMode={viewMode} />
           </div>
         )}
       </div>
