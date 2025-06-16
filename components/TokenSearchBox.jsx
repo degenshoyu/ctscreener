@@ -40,17 +40,11 @@ export default function TokenSearchBox({ address, setAddress, walletAddress, isL
         let selectedTweets = [];
 
         if (activeTab === "earliest") {
-          const sorted = [...jobJson.tweets].sort(
-            (a, b) => new Date(a.datetime) - new Date(b.datetime)
-          );
-          selectedTweets = sorted.slice(0, 5);
+          selectedTweets = [...jobJson.tweets]
+            .sort((a, b) => new Date(a.datetime) - new Date(b.datetime))
+            .slice(0, 5);
         } else if (activeTab === "shiller") {
-          const scored = [...jobJson.tweets].map(tweet => ({
-          ...tweet,
-      _score: (tweet.views || 0) + (tweet.likes || 0) * 1000,
-    }));
-          const sorted = scored.sort((a, b) => b._score - a._score);
-    selectedTweets = sorted.slice(0, 10);
+          selectedTweets = (jobJson.scored_tweets || []).slice(0, 10);
   } else {
     selectedTweets = jobJson.tweets.slice(0, 5);
         }
@@ -58,7 +52,7 @@ export default function TokenSearchBox({ address, setAddress, walletAddress, isL
         setEarliestTweets(selectedTweets);
         onTweets(selectedTweets);
 
-        console.log("✅ Fetched earliest tweets:", jobJson.tweets.slice(0, 5));
+        console.log("✅ Fetched earliest tweets:", selectedTweets);
         onSearch(false);
         setIsSearching(false);
       } else if (jobJson.status === "processing") {

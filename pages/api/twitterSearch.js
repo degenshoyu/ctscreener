@@ -46,6 +46,7 @@ export default async function handler(req, res) {
       keyword: tokenAddress,
       start_date,
       end_date,
+      mode: "shiller",
     };
   } else {
     apiPath = "/search/early";
@@ -56,6 +57,7 @@ export default async function handler(req, res) {
       keyword: tokenAddress,
       end_date: until,
       start_date: "",
+      mode: "shiller",
     };
   }
 
