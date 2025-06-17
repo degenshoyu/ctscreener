@@ -20,7 +20,6 @@ import Topbar from "@/components/Topbar";
 
 const navItems = [
   { label: "Coin Analyst", href: "/", icon: LayoutDashboard },
-  { label: "X Watcher", href: "/x-watcher", icon: Eye },
   { label: "API Key", href: "/api-key", icon: KeyRound },
   { label: "System Status", href: "/system-status", icon: FileText },
   { label: "Documentation", href: "/docs", icon: Book },
