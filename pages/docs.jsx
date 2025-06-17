@@ -1,6 +1,5 @@
 import Head from "next/head";
 import DashboardLayout from "@/components/DashboardLayout";
-import Topbar from "@/components/Topbar";
 
 export default function DocumentationPage() {
   return (
@@ -10,7 +9,6 @@ export default function DocumentationPage() {
         <meta name="description" content="How to use ctScreener tools like Coin Analyst and X Watcher, and explore the available API endpoints." />
       </Head>
       <div className="text-white px-4 py-8">
-        <Topbar />
         <h1 className="text-3xl font-bold mb-2">Documentation</h1>
         <p className="text-gray-400 mb-6">
           Learn how to use ctScreener's modules and access its scanning API endpoints.

@@ -1,7 +1,6 @@
 import Head from "next/head";
 import React, { useEffect, useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
-import Topbar from "@/components/Topbar";
 
 export default function SystemStatusPage() {
   const [statusData, setStatusData] = useState([]);
@@ -34,7 +33,6 @@ export default function SystemStatusPage() {
         />
       </Head>
     <div className="text-white px-4 py-8">
-    <Topbar />
       <h1 className="text-3xl font-bold mb-2">System Status</h1>
       <p className="text-gray-400 mb-6">Realtime health and usage metrics of Twitter scanning infrastructure</p>
 

@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import TooltipWrapper from "@/components/ui/TooltipWrapper";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
+import Topbar from "@/components/Topbar";
 
 const navItems = [
   { label: "Coin Analyst", href: "/", icon: LayoutDashboard },
@@ -31,7 +32,7 @@ export default function DashboardLayout({ children }) {
   const [collapsed, setCollapsed] = useLocalStorage("sidebar-collapsed", false);
 
   return (
-    <div className="min-h-screen flex bg-black text-white">
+    <div className="min-h-screen flex bg-mainBg text-white">
       {/* Sidebar */}
       <aside className={`${ collapsed ? "w-24" : "w-64" } bg-sidebar border-r-2 border-sidebarBorder p-6 space-y-4 transition-all duration-200`}>
 
@@ -94,12 +95,16 @@ export default function DashboardLayout({ children }) {
         </nav>
       </aside>
 
-
+            {/* Right content with sticky Topbar */}
+      <div className="flex-1 flex flex-col">
+        {/* ✅ Topbar 固定 */}
+        <Topbar />
 
              {/* Main content */}
       <main className="flex-1 p-6 overflow-y-auto bg-mainBg">
         {children}
       </main>
+      </div>
     </div>
   );
 }

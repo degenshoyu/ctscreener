@@ -1,6 +1,5 @@
 import Head from "next/head";
 import DashboardLayout from "@/components/DashboardLayout";
-import Topbar from "@/components/Topbar";
 
 export default function XWatcherPage() {
   return (
@@ -14,7 +13,6 @@ export default function XWatcherPage() {
         <meta property="og:image" content="/cover.png" />
       </Head>
       <div className="text-white px-4 py-8">
-        <Topbar />
         <h1 className="text-3xl font-bold mb-2">X Watcher</h1>
         <p className="text-gray-400 mb-6">
           Real-time Twitter watcher. Get instant alerts when your favorite KOLs tweet.

@@ -4,12 +4,136 @@ import { Card, CardContent } from "@/components/ui/card";
 import { MessageCircle, Repeat, Heart, BarChart } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { DataTable } from "@/components/DataTable";
+import linkify from 'linkifyjs';
+import Linkify from 'linkify-react';
+import 'linkify-plugin-hashtag';
+import 'linkify-plugin-mention';
+
+const linkifyOptions = {
+  target: '_blank',
+  rel: 'noopener',
+  className: 'text-blue-400 underline break-all',
+  formatHref: {
+    hashtag: (href) => `https://twitter.com/hashtag/${href.substring(1)}`,
+    mention: (href) => `https://twitter.com/${href.substring(1)}`,
+  },
+};
 
 export default function TweetList({ tweets, viewMode = "embed" }) {
+  const [loadingUsers, setLoadingUsers] = useState({});
+
+  const [followersCache, setFollowersCache] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("followersCache");
+      return saved ? JSON.parse(saved) : {};
+    }
+    return {};
+  });
+
+  const [scanTimestamps, setScanTimestamps] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("scanTimestamps");
+      return saved ? JSON.parse(saved) : {};
+    }
+    return {};
+  });
+  const [userJobs, setUserJobs] = useState({});
+
   const formatNumber = (num) => {
     if (num >= 1_000_000) return (num / 1_000_000).toFixed(1).replace(/\.0$/, '') + "M";
     if (num >= 1_000) return (num / 1_000).toFixed(1).replace(/\.0$/, '') + "K";
     return num;
+  };
+
+  const updateScanTimestamp = (username, now) => {
+    setScanTimestamps(prev => {
+      const updated = { ...prev, [username]: now };
+      localStorage.setItem("scanTimestamps", JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const updateFollowersCache = (username, count) => {
+    setFollowersCache(prev => {
+      const updated = { ...prev, [username]: count };
+      localStorage.setItem("followersCache", JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const singleScan = async ( username, row) => {
+    const now = Date.now();
+
+    setLoadingUsers(prev => ({ ...prev, [username]: true }));
+
+    updateScanTimestamp(username, now);
+
+    let job_id = userJobs[username];
+
+    if (!job_id) {
+      const res = await fetch("/api/fetchUsers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username }),
+      });
+      const data = await res.json();
+        job_id = data.user_job_id;
+        setUserJobs((prev) => ({ ...prev, [username]: job_id }));
+    }
+
+      const pollJob = async (jobId, retries = 200, retryZero = 3) => {
+        if (retries <= 0) return;
+
+          const res = await fetch(`/api/jobProxy?job_id=${jobId}`);
+          const job = await res.json();
+
+        if (job.status === "completed") {
+          const newFollowers = job.user?.followers || 0;
+
+          if (newFollowers === 0 && retryZero > 0) {
+            console.log(`🔁 Retry because followers = 0, left: ${retryZero}`);
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            return pollJob(jobId, retries - 1, retryZero - 1);
+          }
+
+          if (row) {
+            row.original.followers = newFollowers;
+            row._valuesCache = undefined;
+          } else {
+            const target = tweets.find(t => t.tweeter === username);
+            if (target) {
+              target.followers = newFollowers;
+            }
+          }
+          updateFollowersCache(username, newFollowers);
+          setScanTimestamps(prev => ({ ...prev, [username]: now }));
+        } else if (job.status === "processing") {
+          await new Promise(resolve => setTimeout(resolve, 3000));
+          return pollJob(jobId, retries - 1);
+        }
+      };
+
+    await pollJob(job_id);
+
+    setLoadingUsers(prev => {
+      const updated = { ...prev };
+      delete updated[username];
+      return updated;
+    });
+  };
+
+  const handleScanAll = async () => {
+    const now = Date.now();
+    for (const tweet of tweets) {
+      const username = tweet.tweeter;
+      const lastScan = scanTimestamps[username];
+      const canScan = !lastScan || now - lastScan > 10 * 60 * 1000;
+      if (canScan) {
+        await singleScan(username);
+      } else {
+        console.log(`🔒 Skip ${username}, locked.`);
+      }
+    }
   };
 
   useEffect(() => {
@@ -49,8 +173,65 @@ export default function TweetList({ tweets, viewMode = "embed" }) {
     },
     {
       accessorKey: "followers",
-      header: "Followers",
-      cell: ({ row }) => formatNumber(row.original.followers ?? 0),
+      header: () => (
+        <div className="flex items-center gap-2">
+          Followers
+          <button
+            onClick={handleScanAll}
+            className="px-2 py-0.5 text-xs rounded bg-green-600 text-white hover:bg-green-700"
+          >
+            Scan All
+          </button>
+        </div>
+      ),
+      cell: ({ row }) => {
+        const username = row.original.tweeter;
+        const isLoading = !!loadingUsers[username];
+        const followers = formatNumber(followersCache[username] ?? row.original.followers ?? 0);
+        const now = Date.now();
+        const lastScan = scanTimestamps[username];
+        const canScan = !lastScan || now - lastScan > 10 * 60 * 1000;
+
+          return (
+            <div className="flex items-center gap-2">
+              <span>{followers}</span>
+              <button
+                onClick={() => singleScan(username, row)}
+                disabled={!canScan}
+                className={`px-2 py-0.5 text-xs rounded ${
+                  canScan && !isLoading
+                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                    : "bg-gray-700 text-gray-400 cursor-not-allowed"
+                }`}
+              >
+                {isLoading ? (
+                  <svg
+                    className="animate-spin h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v8H4z"
+                    ></path>
+                  </svg>
+                ) : (
+                  "Scan"
+                )}
+              </button>
+            </div>
+          );
+        },
     },
     {
       accessorKey: "tweetId",
@@ -106,8 +287,10 @@ export default function TweetList({ tweets, viewMode = "embed" }) {
               <Dialog.Title className="text-lg font-semibold mb-4 text-white">
                 Tweet Full Text
               </Dialog.Title>
-              <div className="text-gray-300 whitespace-pre-line">
-                {row.original.textContent || "No text"}
+              <div className="text-gray-300 whitespace-pre-line break-all">
+                <Linkify options={linkifyOptions}>
+                  {row.original.textContent || "No text"}
+                </Linkify>
               </div>
               <Dialog.Close asChild>
                 <button className="mt-6 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
@@ -119,7 +302,7 @@ export default function TweetList({ tweets, viewMode = "embed" }) {
         </Dialog.Root>
       ),
     },
-  ], []);
+  ], [scanTimestamps, followersCache, loadingUsers]);
 
   if (!tweets || tweets.length === 0) {
     return <p className="text-zinc-400 text-sm">No tweets found.</p>;

@@ -1,6 +1,5 @@
 import Head from "next/head";
 import DashboardLayout from "@/components/DashboardLayout";
-import Topbar from "@/components/Topbar";
 
 export default function CommunityPage() {
   return (
@@ -14,7 +13,6 @@ export default function CommunityPage() {
         <meta property="og:image" content="/cover.png" />
       </Head>
       <div className="text-white px-4 py-8">
-        <Topbar />
         <h1 className="text-3xl font-bold mb-2">Community</h1>
         <p className="text-gray-400 mb-6 max-w-2xl">
           We’re building the most powerful data platform for crypto Twitter. Join our community to shape what comes next — and help us spread the word about the

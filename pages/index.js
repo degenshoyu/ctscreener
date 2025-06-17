@@ -9,7 +9,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import dynamic from "next/dynamic";
-import Topbar from "@/components/Topbar";
 import TokenSearchBox from "@/components/TokenSearchBox";
 import TokenInfoCard from "@/components/TokenInfoCard";
 import TweetList from "@/components/TweetList";
@@ -53,7 +52,6 @@ export default function HomePage() {
         <meta property="og:image" content="/cover.png" />
       </Head>
       <div className="text-white px-4 py-8">
-        <Topbar />
         <h1 className="text-3xl font-bold mb-2">Coin Analyst</h1>
         <p className="text-gray-400 mb-6">
           Discover early callers of winning coins on X.

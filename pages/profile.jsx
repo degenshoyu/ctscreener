@@ -2,7 +2,6 @@
 
 import Head from "next/head";
 import DashboardLayout from "@/components/DashboardLayout";
-import Topbar from "@/components/Topbar";
 import { usePrivy } from "@privy-io/react-auth";
 import { useState, useEffect, useMemo } from "react"
 import { useToast } from "@/hooks/use-toast";
@@ -135,7 +134,6 @@ export default function ProfilePage() {
         <title>Profile - ctScreener</title>
       </Head>
       <div className="text-white px-4 py-8">
-        <Topbar />
 
       <div className="max-w-4l mx-auto space-y-6">
         <h1 className="text-3xl font-bold">Profile</h1>
