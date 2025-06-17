@@ -17,7 +17,7 @@ export default function ApiKeyPage() {
         <Topbar />
         <h1 className="text-3xl font-bold mb-2">API Key (coming soon...)</h1>
         <p className="text-gray-400 mb-6">
-          Get access to our self-developed Twitter API — designed for developers.
+          Get access to our Crypto Twitter Database — designed for developers.
         </p>
 
         <div className="bg-gray-900 rounded-xl p-6 border border-gray-700 max-w-2xl space-y-6">
