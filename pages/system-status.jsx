@@ -8,11 +8,10 @@ export default function SystemStatusPage() {
     useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const [api,live] = await Promise.all([
+        const [api] = await Promise.all([
           fetch("/api/apiStatusProxy").then((r) => r.json()),
-          fetch("/api/liveStatusProxy").then((r) => r.json()),
         ]);
-        setStatusData([api, live])
+        setStatusData([api])
       } catch (err) {
         console.error("❌ Failed to fetch system status:", err);
       }
