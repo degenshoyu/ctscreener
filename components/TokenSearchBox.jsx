@@ -42,11 +42,11 @@ export default function TokenSearchBox({ address, setAddress, walletAddress, isL
         if (activeTab === "earliest") {
           selectedTweets = [...jobJson.tweets]
             .sort((a, b) => new Date(a.datetime) - new Date(b.datetime))
-            .slice(0, 5);
+            .slice(0, 20);
         } else if (activeTab === "shiller") {
           selectedTweets = (jobJson.scored_tweets || []).slice(0, 10);
   } else {
-    selectedTweets = jobJson.tweets.slice(0, 5);
+    selectedTweets = jobJson.tweets.slice(0, 20);
         }
 
         setEarliestTweets(selectedTweets);
