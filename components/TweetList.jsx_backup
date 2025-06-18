@@ -20,7 +20,6 @@ const linkifyOptions = {
 };
 
 export default function TweetList({ tweets, viewMode = "embed" }) {
-  const updateRunning = React.useRef(false);
   const [loadingUsers, setLoadingUsers] = useState({});
 
   const [followersCache, setFollowersCache] = useState(() => {
@@ -123,13 +122,6 @@ export default function TweetList({ tweets, viewMode = "embed" }) {
   };
 
 const handleUpdate = async () => {
-  if (updateRunning.current) {
-    console.log("⏳ Update already running, skip new click.");
-    return;
-  }
-
-  updateRunning.current = true;
-
   const now = Date.now();
 
   const uniqueUsers = [...new Set(tweets.map(t => t.tweeter))];
@@ -137,7 +129,6 @@ const handleUpdate = async () => {
   const usersToUpdate = uniqueUsers.filter(username => {
     const lastScan = scanTimestamps[username];
     const followers = followersCache[username] ?? tweets.find(t => t.tweeter === username)?.followers ?? 0;
-    const isLocked = userLocks.current[username];
     return !lastScan || now - lastScan > 60 * 60 * 1000 || followers === 0;
   });
 
@@ -148,8 +139,6 @@ const handleUpdate = async () => {
   }
 
   console.log("✅ All done!");
-
-  updateRunning.current = false;
 };
 
   useEffect(() => {
@@ -215,11 +204,36 @@ const handleUpdate = async () => {
 
           return (
             <div className="flex items-center justify-between w-full">
-              <div className="flex items-center gap-1">
-              <span className="text-base">{followers}</span>
+              <span className="flex items-center gap-2">
+              {followers}
+              {!isLoading && !needsUpdate && (
+                <span
+                  className="
+                    absolute
+                    top-0
+                    right-0
+                    translate-x-1/2
+                    -translate-y-1/2
+                    bg-green-600
+                    text-white
+                    text-[10px]
+                    px-1.5
+                    py-0.5
+                    rounded-full
+                    leading-none
+                    whitespace-nowrap
+                  "
+                  title="Up to date"
+                >
+                  Up to date
+                </span>
+              )}
+            </span>
+
+              {/* Spinner */}
               {isLoading && (
                 <svg
-                  className="animate-spin h-4 w-4 text-blue-400"
+                  className="animate-spin h-4 w-4 text-blue-400 absolute -top-1 -right-4"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -238,29 +252,10 @@ const handleUpdate = async () => {
                     d="M4 12a8 8 0 018-8v8H4z"
                   ></path>
                 </svg>
-              )}
+                )}
             </div>
-
-            {!isLoading && !needsUpdate && (
-              <span
-                className="
-                  bg-green-600
-                  text-white
-                  text-[10px]
-                  px-1.5
-                  py-0.5
-                  rounded-full
-                  leading-none
-                  whitespace-nowrap
-                "
-                title="Up to date"
-              >
-                Up to date
-              </span>
-            )}
-          </div>
-        );
-      },
+          );
+        },
     },
     {
       accessorKey: "tweetId",

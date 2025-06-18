@@ -58,7 +58,7 @@ export default function ApiKeyPage() {
           </div>
 
           <div>
-            <p className="mt-3 text-yellow-300">🚧 API service is currently in alpha — powering <strong>Coin Analyst</strong> and <strong>X Watcher</strong>.</p>
+            <p className="mt-3 text-yellow-300">🚧 API service is currently in alpha — powering <strong>Coin Analyst</strong>.</p>
             <p className="mt-3 text-yellow-300">🚀 Public beta access launching in <strong>30th June 2025</strong>. Stay tuned for early access opportunities.</p>
           </div>
         </div>

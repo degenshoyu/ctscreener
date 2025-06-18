@@ -28,18 +28,6 @@ export default function DocumentationPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold mb-2">👀 X Watcher (LIVE)</h2>
-            <p className="text-gray-300">
-              X Watcher is a real-time listener that lets you subscribe to Twitter accounts and:
-            </p>
-            <ul className="list-disc list-inside text-gray-400 mt-2">
-              <li>Receive alerts on new tweets by selected users</li>
-              <li>Track follow/unfollow activity</li>
-              <li>Correlate tweet events with wallet behavior</li>
-            </ul>
-          </section>
-
-          <section>
             <h2 className="text-2xl font-semibold mb-2">🔌 Twitter Scanner API (Alpha)</h2>
             <p className="text-gray-300 mb-2">
               Below are the available endpoints in alpha (not opened to the public):
