@@ -1,7 +1,7 @@
 // components/TweetList.jsx
 import React,{ useEffect, useState,useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { MessageCircle, Repeat, Heart, BarChart } from "lucide-react";
+import { MessageCircle, Repeat, Heart, BarChart, BadgeCheck } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { DataTable } from "@/components/DataTable";
 import linkify from 'linkifyjs';
@@ -162,13 +162,18 @@ export default function TweetList({ tweets, viewMode = "embed" }) {
       accessorKey: "tweeter",
       header: "Tweeter",
       cell: ({ row }) => (
+        <div className="flex items-center gap-1">
         <a
           href={`https://twitter.com/${row.original.tweeter}`}
           target="_blank"
           className="text-blue-400 hover:underline"
         >
-          {row.original.tweeter}
+          @{row.original.tweeter}
         </a>
+          {row.original.isVerified && (
+              <BadgeCheck className="w-4 h-4 text-sky-400" />
+          )}
+        </div>
       ),
     },
     {
