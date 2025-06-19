@@ -242,11 +242,25 @@ export default function TokenSearchBox({ address, setAddress, walletAddress, isL
     <div className="w-full mb-6">
 
     {/* 原始输入框 + 搜索按钮区域 */}
-    <div className="flex gap-2 items-center">
+    <div className="
+      flex items-center
+      rounded-full
+      border border-blue-400/30
+      backdrop-blur-md
+      bg-gradient-to-br from-blue-900/50 to-blue-600/30
+      shadow-[0_0_20px_rgba(96,165,250,0.1)]
+      px-4 py-2
+    ">
       <input
         type="text"
         placeholder="Enter Solana token address..."
-        className="px-4 py-2 border border-gray-600 bg-[#191B2A] text-white w-full rounded-md"
+        className="
+         flex-1 px-5 py-3
+         bg-transparent text-white
+         placeholder:text-white/50
+         focus:outline-none
+        rounded-full
+        "
         value={address}
         onChange={(e) => setAddress(e.target.value)}
       />
@@ -259,7 +273,16 @@ export default function TokenSearchBox({ address, setAddress, walletAddress, isL
           isSearching || !address.trim() ||
           (activeTab === "shiller" && !walletAddress)
         }
-        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+        className="
+         px-5 py-3 ml-2
+         rounded-full
+         font-semibold text-white
+         backdrop-blur-lg
+         bg-gradient-to-br from-blue-900/50 to-blue-600/30
+         border border-blue-400/30 shadow-xl
+         transition-all duration-300
+         hover:scale-105 hover:shadow-2xl disabled:opacity-50
+        "
       >
         {isSearching ? "Searching..." : "Search"}
       </button>

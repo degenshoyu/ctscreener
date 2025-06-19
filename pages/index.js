@@ -38,6 +38,8 @@ export default function HomePage() {
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
+  const shillerWindows = ["24h", "7d", "30d"];
+
   const pagedTweets = useMemo(() => {
     return [...tweets].slice((page - 1) * pageSize, page * pageSize);
   }, [tweets, page]);
@@ -59,8 +61,17 @@ export default function HomePage() {
         <meta property="og:image" content="/cover.png" />
       </Head>
       <div className="text-white px-4 py-8">
-        <h1 className="text-3xl font-bold mb-2">Coin Analyst</h1>
-        <p className="text-gray-400 mb-6">
+        <h1
+          className="
+          text-5xl font-extrabold mb-2
+          bg-gradient-to-br from-blue-400 via-cyan-300 to-blue-500
+          bg-clip-text text-transparent
+          drop-shadow-[0_2px_10px_rgba(96,165,250,0.3)]
+        "
+        >
+          Coin Analyst
+        </h1>
+        <p className="text-lg text-blue-100/80 italic animate-fadeInSlow max-w-lg mb-6">
           Discover early callers of winning coins on X.
         </p>
 
@@ -80,73 +91,75 @@ export default function HomePage() {
           />
         </div>
 
-        <div className="mt-6 max-w-xl">
-          <RadioGroup
-            value={activeTab}
-            onValueChange={(val) => setActiveTab(val)}
-            className="flex items-center gap-8"
-          >
-            <TooltipProvider>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="earliest" id="r1" />
-                <label htmlFor="r1" className="text-sm text-gray-300">
-                  Early callers
-                </label>
-              </div>
+        <TooltipProvider>
+          <div>
+            {/* === Option Buttons === */}
+            <div className="flex items-center gap-4 flex-wrap">
+              <button
+                onClick={() => setActiveTab("earliest")}
+                className={`
+          px-4 py-2 rounded-full font-medium transition-all duration-300
+          ${
+            activeTab === "earliest"
+              ? "bg-gradient-to-br from-blue-500/50 to-blue-400/30 text-white shadow-md"
+              : "border border-blue-400/30 text-blue-100 hover:bg-blue-400/10 backdrop-blur-md"
+          }
+        `}
+              >
+                Early callers
+              </button>
 
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="shiller" id="r2" />
-                <label htmlFor="r2" className="text-sm text-gray-300">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setActiveTab("shiller")}
+                  className={`
+            px-4 py-2 rounded-full font-medium transition-all duration-300
+            ${
+              activeTab === "shiller"
+                ? "bg-gradient-to-br from-blue-500/50 to-blue-400/30 text-white shadow-md"
+                : "border border-blue-400/30 text-blue-100 hover:bg-blue-400/10 backdrop-blur-md"
+            }
+          `}
+                >
                   Top shillers
-                </label>
+                </button>
 
                 {activeTab === "shiller" && (
-                  <Select.Root
-                    value={shillerWindow}
-                    onValueChange={setShillerWindow}
-                  >
-                    <Select.Trigger className="inline-flex items-center justify-between px-2 py-1 rounded bg-gray-800 text-white text-sm border border-gray-600">
-                      <Select.Value />
-                      <Select.Icon className="ml-1">
-                        <ChevronDownIcon />
-                      </Select.Icon>
-                    </Select.Trigger>
-
-                    <Select.Content className="bg-gray-800 text-white text-sm border border-gray-600 rounded shadow">
-                      <Select.Viewport className="p-1">
-                        <Select.Item
-                          value="24h"
-                          className="px-3 py-1 rounded hover:bg-gray-700 cursor-pointer"
-                        >
-                          <Select.ItemText>Last 24h</Select.ItemText>
-                        </Select.Item>
-                        <Select.Item
-                          value="7d"
-                          className="px-3 py-1 rounded hover:bg-gray-700 cursor-pointer"
-                        >
-                          <Select.ItemText>Last 7d</Select.ItemText>
-                        </Select.Item>
-                        <Select.Item
-                          value="30d"
-                          className="px-3 py-1 rounded cursor-pointer data-[disabled]:cursor-not-allowed data-[disabled]:hover:bg-transparent hover:bg-gray-700"
-                          disabled
-                        >
-                          <Select.ItemText>Last 30d</Select.ItemText>
-                        </Select.Item>
-                      </Select.Viewport>
-                    </Select.Content>
-                  </Select.Root>
+                  <div className="flex items-center gap-2 ml-2">
+                    {shillerWindows.map((w) => (
+                      <button
+                        key={w}
+                        onClick={() => setShillerWindow(w)}
+                        disabled={w === "30d"}
+                        className={`
+                  px-3 py-1 rounded-full text-sm font-medium transition-all duration-300
+                  ${w === "30d" ? "opacity-50 cursor-not-allowed" : ""}
+                  ${
+                    shillerWindow === w
+                      ? "bg-gradient-to-br from-blue-400/60 to-cyan-300/30 text-white shadow"
+                      : "border border-blue-400/30 text-blue-100 hover:bg-blue-400/10 backdrop-blur-md"
+                  }
+                `}
+                      >
+                        {w}
+                      </button>
+                    ))}
+                  </div>
                 )}
               </div>
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="significant" id="r3" disabled />
-                    <label htmlFor="r3" className="text-sm text-gray-500">
-                      High-impact callers
-                    </label>
-                  </div>
+                  <button
+                    disabled
+                    className="
+              px-4 py-2 rounded-full font-medium
+              border border-blue-200/20 text-blue-200
+              backdrop-blur-md cursor-not-allowed opacity-50
+            "
+                  >
+                    High-impact callers 🚧
+                  </button>
                 </TooltipTrigger>
                 <TooltipContent
                   side="top"
@@ -155,25 +168,51 @@ export default function HomePage() {
                   🚧 Coming soon
                 </TooltipContent>
               </Tooltip>
-            </TooltipProvider>
-          </RadioGroup>
+            </div>
 
-          <div className="mt-4 flex items-center gap-4">
-            <label className="text-sm text-gray-400">View tweets as</label>
-            <button
-              onClick={() => setViewMode("embed")}
-              className={`flex items-center gap-1 text-sm px-3 py-1 rounded ${viewMode === "embed" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"}`}
-            >
-              <LayoutGrid size={16} /> Embed Card
-            </button>
-            <button
-              onClick={() => setViewMode("list")}
-              className={`flex items-center gap-1 text-sm px-3 py-1 rounded ${viewMode === "list" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"}`}
-            >
-              <List size={16} /> Tweet List
-            </button>
+            {/* === View tweets as === */}
+            <div className="mt-4 flex items-center gap-4 flex-wrap">
+              <label
+                className="
+                text-sm font-medium
+                bg-gradient-to-br from-blue-400 via-cyan-300 to-blue-500
+                bg-clip-text text-transparent
+              "
+              >
+                View tweets as
+              </label>
+
+              <button
+                onClick={() => setViewMode("embed")}
+                className={`
+                flex items-center gap-1 text-sm px-4 py-2 rounded-full
+      transition-all duration-300
+      ${
+        viewMode === "embed"
+          ? "bg-gradient-to-br from-blue-500/50 to-blue-400/30 text-white shadow-md"
+          : "border border-blue-400/30 text-blue-100 hover:bg-blue-400/10 backdrop-blur-md"
+      }
+      `}
+              >
+                <LayoutGrid size={16} /> Embed Card
+              </button>
+              <button
+                onClick={() => setViewMode("list")}
+                className={`
+      flex items-center gap-1 text-sm px-4 py-2 rounded-full
+      transition-all duration-300
+      ${
+        viewMode === "list"
+          ? "bg-gradient-to-br from-blue-500/50 to-blue-400/30 text-white shadow-md"
+          : "border border-blue-400/30 text-blue-100 hover:bg-blue-400/10 backdrop-blur-md"
+      }
+    `}
+              >
+                <List size={16} /> Tweet List
+              </button>
+            </div>
           </div>
-        </div>
+        </TooltipProvider>
 
         {tokenInfo && (
           <div className="mt-6">

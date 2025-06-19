@@ -9,7 +9,7 @@ import {
   Book,
   Users,
   BarChart2,
-  FileText,
+  Activity,
   Settings,
   ChevronLeft,
   ChevronRight,
@@ -21,7 +21,7 @@ import Topbar from "@/components/Topbar";
 const navItems = [
   { label: "Coin Analyst", href: "/", icon: LayoutDashboard },
   { label: "API Key", href: "/api-key", icon: KeyRound },
-  { label: "System Status", href: "/system-status", icon: FileText },
+  { label: "System Status", href: "/system-status", icon: Activity },
   { label: "Documentation", href: "/docs", icon: Book },
   { label: "Community", href: "/community", icon: Users },
 ];
@@ -33,7 +33,7 @@ export default function DashboardLayout({ children }) {
   return (
     <div className="min-h-screen flex bg-mainBg text-white">
       {/* Sidebar */}
-      <aside className={`${ collapsed ? "w-24" : "w-64" } bg-sidebar border-r-2 border-sidebarBorder p-6 space-y-4 transition-all duration-200`}>
+      <aside className={`${ collapsed ? "w-24" : "w-64" } sticky top-0 h-screen bg-mainBg/80 backdrop-blur-md border-r-[0.5px] border-blue-400/40 shadow-[4px_0_12px_-2px_rgba(96,165,250,0.1)] p-6 space-y-4 transition-all duration-200 overflow-y-auto`}>
 
         {/* Toggle Button */}
         <div className="flex justify-end">
@@ -46,11 +46,11 @@ export default function DashboardLayout({ children }) {
         </div>
         <div className="flex items-center justify-between mb-4">
           <Link href="/" legacyBehavior>
-            <a className="flex items-center gap-3">
+            <a className="flex items-center gap-3 group">
               <img
                 src="/logo.svg"
                 alt="Logo"
-                className={`transition-all duration-200 ${collapsed ? "w-8" : "w-10"}`}
+                className={`transition-all duration-500 ${collapsed ? "w-8" : "w-10"} group-hover:animate-spin`}
               />
               {!collapsed && (
                 <div className="flex flex-col leading-tight">
@@ -70,21 +70,27 @@ export default function DashboardLayout({ children }) {
               <Link key={href} href={href} legacyBehavior>
                   {collapsed ? (
                     <a
-                        className={`block w-full flex items-center justify-center w-10 h-10 rounded-md transition-colors duration-150 ${
-                          active ? "bg-cyan-700" : "hover:bg-gray-700"
+                        className={`block w-full flex items-center justify-center w-10 h-10 rounded-md transition-colors transition-all duration-300 ${
+                          active
+                          ? "bg-gradient-to-br from-blue-500/50 to-blue-400/30 text-white shadow-md"
+      : "border-blue-400/30 hover:bg-blue-400/10 backdrop-blur-md"
+
                         }`}
                       >
                        <TooltipWrapper label={label}>
-                        <Icon className="w-[18px] h-[18px]" />
+                        <Icon className="w-[18px] h-[18px] transition-transform duration-300 group-hover:rotate-180" />
                       </TooltipWrapper>
                     </a>
                   ) : (
                     <a
-                      className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 ${
-                        active ? "bg-cyan-700" : "hover:bg-gray-700"
+                      className={`group flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors transition-all duration-300 ${
+                        active
+                            ? "bg-gradient-to-br from-blue-500/50 to-blue-400/30 text-white shadow-md"
+  : "border-blue-400/30 hover:bg-blue-400/10 backdrop-blur-md"
+
                       }`}
                     >
-                      <Icon className="w-[18px] h-[18px]" />
+                      <Icon className="w-[18px] h-[18px] transition-transform duration-300 group-hover:rotate-180" />
                       <span>{label}</span>
                     </a>
                   )}
