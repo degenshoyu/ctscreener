@@ -6,6 +6,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useState, useEffect, useRef } from "react";
 import { ChevronDown } from "lucide-react";
 import { useRouter } from "next/router";
+import { User, LogOut } from "lucide-react";
 
 export default function WalletButton() {
   const { connectWallet } = useConnectWallet();
@@ -91,8 +92,8 @@ export default function WalletButton() {
           <div
             className="
               absolute right-0 mt-2 w-48
-              bg-gradient-to-br from-blue-900/90 to-blue-600/50
-              backdrop-blur-lg shadow-xl rounded-lg
+              bg-white/10 border border-blue-400/20
+              backdrop-blur-xl shadow-2xl rounded-2xl
               overflow-hidden animate-fadeIn
             "
           >
@@ -100,21 +101,23 @@ export default function WalletButton() {
               {Math.floor(ctsBalance).toLocaleString()} $ctS
             </div>
             <button
-              className="w-full px-5 py-3 text-left text-white hover:bg-blue-700/30 transition"
+              className="flex items-center gap-2 w-full px-5 py-3 text-left text-white hover:bg-blue-700/30 transition"
               onClick={() => {
                 router.push("/profile");
                 setDropdownOpen(false);
               }}
             >
+              <User className="w-4 h-4" />
               Profile
             </button>
             <button
-              className="w-full px-5 py-3 text-left text-white hover:bg-blue-700/30 transition"
+              className="flex items-center gap-2 w-full px-5 py-3 text-left text-white hover:bg-blue-700/30 transition"
               onClick={() => {
                 logout();
                 setDropdownOpen(false);
               }}
             >
+              <LogOut className="w-4 h-4" />
               Logout
             </button>
           </div>
