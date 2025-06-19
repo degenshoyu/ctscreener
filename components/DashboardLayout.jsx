@@ -85,15 +85,17 @@ export default function DashboardLayout({ children }) {
     <div className="min-h-screen flex bg-mainBg text-white relative overflow-hidden">
         {/* === Fancy floating stars === */}
     <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-      {starRefs.current.map((star, i) => (
+  {starRefs.current.map((star, i) => (
     <div
       key={i}
-      className="absolute rounded-full bg-white/70 blur-[1.5px]"
+      className="absolute rounded-full blur-[2px]"
       style={{
         top: `${star.y}px`,
         left: `${star.x}px`,
-        width: `3px`,
-        height: `3px`,
+        width: `${star.size * 2}px`,
+        height: `${star.size * 2}px`,
+        backgroundColor: `hsl(${star.hue} 100% 70% / 1)`,
+        boxShadow: `0 0 6px hsl(${star.hue} 100% 70% / 0.6)`,
       }}
     />
   ))}
