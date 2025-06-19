@@ -10,6 +10,8 @@ import TweetList from "@/components/TweetList";
 import { Trash, Wallet, Save as SaveIcon, ArrowRight } from "lucide-react";
 import * as Select from "@radix-ui/react-select";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
+import { LayoutGrid, List } from "lucide-react";
+import { calculateShillerScore } from "@/lib/shillerScore";
 
 export default function ProfilePage() {
   const { user, authenticated } = usePrivy();
@@ -42,7 +44,7 @@ export default function ProfilePage() {
         if (sortKey === "retweets") return (b.retweets || 0) - (a.retweets || 0);
         if (sortKey === "likes") return (b.likes || 0) - (a.likes || 0);
         if (sortKey === "replies") return (b.replies || 0) - (a.replies || 0);
-        if (sortKey === "score") return (b.score || 0) - (a.score || 0);
+        if (sortKey === "score") return calculateShillerScore(b) - calculateShillerScore(a);
         return 0;
       })
       .slice((page - 1) * pageSize, page * pageSize);
@@ -342,21 +344,21 @@ export default function ProfilePage() {
     <label className="text-sm text-gray-400">View Mode:</label>
       <button
         onClick={() => setRetriveViewMode("embed")}
-        className={`px-3 py-1 rounded text-sm ${
+        className={`flex items-center justify-center gap-2 min-w-[120px] px-4 py-2 rounded text-sm ${
           retriveViewMode === "embed" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"
         }`}
       >
-      Embed
-    </button>
-    <button
-      onClick={() => setRetriveViewMode("list")}
-      className={`px-3 py-1 rounded text-sm ${
-        retriveViewMode === "list" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"
-      }`}
-    >
-    List
-    </button>
-  </div>
+        <LayoutGrid size={16} /> Embed Card
+      </button>
+      <button
+        onClick={() => setRetriveViewMode("list")}
+        className={`flex items-center justify-center gap-2 min-w-[120px] px-4 py-2 rounded text-sm ${
+          retriveViewMode === "list" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"
+        }`}
+      >
+        <List size={16} /> Tweet List
+      </button>
+    </div>
 
   <div className="w-full overflow-x-auto">
     <TweetList tweets={sortedPagedTweets} viewMode={retriveViewMode} />
