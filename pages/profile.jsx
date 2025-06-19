@@ -14,10 +14,19 @@ import { LayoutGrid, List } from "lucide-react";
 import { calculateShillerScore } from "@/lib/shillerScore";
 
 export default function ProfilePage() {
+  const [jobStatusMap, setJobStatusMap] = useState({});
   const { user, authenticated } = usePrivy();
   const { toast } = useToast();
   const walletAddress = user?.wallet?.address;
   const [history, setHistory] = useState([]);
+  const [historyPage, setHistoryPage] = useState(1);
+  const historyPageSize = 10;
+
+  const pagedHistory = useMemo(() => {
+    const start = (historyPage - 1) * historyPageSize;
+    const end = start + historyPageSize;
+    return history.slice(start, end);
+  }, [history, historyPage]);
   const [showPopup, setShowPopup] = useState(false);
   const [retriveJobId, setRetriveJobId] = useState(null);
   const [retriveData, setRetriveData] = useState({ tokenInfo: null, tweets: [] });
@@ -126,8 +135,17 @@ export default function ProfilePage() {
         .then((res) => res.json())
         .then((data) => {
           setHistory(data);
+          data.forEach(async (h) => {
+            try {
+              const res = await fetch(`/api/jobProxy?job_id=${h.job_id}`);
+              const job = await res.json();
+              setJobStatusMap(prev => ({ ...prev, [h.job_id]: job.status }));
+            } catch (err) {
+              console.error(`Failed to get job status for ${h.job_id}`, err);
+            }
         });
-    }
+    });
+  }
   }, [authenticated, walletAddress]);
 
   return (
@@ -177,60 +195,117 @@ export default function ProfilePage() {
 
       {/* === Search History Card === */}
       <div className="bg-sidebar p-6 rounded-lg">
-        <h2 className="text-xl font-semibold mb-4">Search History</h2>
-        {history.length > 0 ? (
-          <ul className="space-y-3">
-            {history.map((h) => (
-              <li
-                key={h._id}
-                className="flex justify-between items-center text-sm text-gray-300 border-b border-gray-700 pb-2"
-              >
-                <div>
-                  <div className="font-semibold">
-                    {h.token_info?.name || "Unknown"} ({h.token_info?.symbol || ""})
-                  <span className="ml-2 px-2 py-0.5 rounded bg-gray-700 text-xs">
-                    {h.mode === "shiller" ? `Top shillers (${h.window})` : "Early callers"}
-                  </span>
-                  </div>
-                  <div className="text-xs text-gray-400">
-                    {h.token_address.slice(0, 4)}...{h.token_address.slice(-4)}
-                  </div>
-                </div>
-                <div className="flex flex-col items-end text-xs text-gray-400">
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => {
-                        setRetriveJobId(h.job_id);
-                        setShowPopup(true);
-                        pollJobResult(h.job_id);
-                      }}
-                      className="text-blue-400 hover:underline text-xs"
-                    >
-                      Retrieve
-                    </button>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold mb-4">Search History</h2>
+            <button
+              onClick={() => {
+                history.forEach(async (h) => {
+                  const res = await fetch(`/api/jobProxy?job_id=${h.job_id}`);
+                  const job = await res.json();
+                  setJobStatusMap(prev => ({ ...prev, [h.job_id]: job.status }));
+                });
+              }}
+              className="text-sm px-3 py-1 rounded bg-gray-700 hover:bg-gray-600"
+            >
+              Refresh Status
+            </button>
+          </div>
 
-                    <button
-                      onClick={async () => {
-                        await fetch(`/api/user/deleteHistory?job_id=${h.job_id}`, {
-                          method: "DELETE",
-                        });
-                        setHistory(history.filter(item => item.job_id !== h.job_id));
-                      }}
-                      className="text-red-400 hover:text-red-600"
-                      aria-label="Delete"
-                    >
-                      <Trash size={16} />
-                    </button>
-                  </div>
-                  <span>
-                    {h.created_at
-                      ? new Date(h.created_at).toLocaleString()
-                      : "Unknown"}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
+{history.length > 0 ? (
+  <div>
+    <div className="overflow-x-auto">
+      <table className="min-w-full text-sm border border-gray-700">
+        <thead className="bg-gray-800 text-gray-300 uppercase text-xs tracking-wider">
+        <tr>
+          <th className="px-4 py-2 text-left">Token</th>
+          <th className="px-4 py-2 text-left">Mode</th>
+          <th className="px-4 py-2 text-left">Status</th>
+          <th className="px-4 py-2 text-left">Date</th>
+          <th className="px-4 py-2 text-left">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+          {pagedHistory.map((h) => (
+          <tr key={h._id} className="border-t border-gray-700 even:bg-[#1f1f29] hover:bg-[#2a2a3a] transition-colors">
+          <td className="px-4 py-2 font-medium">
+            {h.token_info?.name || "Unknown"} ({h.token_info?.symbol || ""})
+          <div className="text-xs text-gray-400">
+            {h.token_address.slice(0, 4)}...{h.token_address.slice(-4)}
+          </div>
+          </td>
+          <td className="px-4 py-2">
+            {h.mode === "shiller" ? `Top shillers (${h.window})` : "Early callers"}
+          </td>
+          <td className="px-4 py-2">
+            <span
+              className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                jobStatusMap[h.job_id] === "completed"
+                  ? "bg-green-600 text-white"
+                  : jobStatusMap[h.job_id] === "processing"
+                  ? "bg-yellow-500 text-black"
+                  : "bg-red-600 text-white"
+              }`}
+            >
+              {jobStatusMap[h.job_id]
+                ? jobStatusMap[h.job_id].charAt(0).toUpperCase() + jobStatusMap[h.job_id].slice(1)
+                : "Unknown"}
+            </span>
+          </td>
+          <td className="px-4 py-2">
+            {h.created_at
+              ? new Date(h.created_at).toLocaleString()
+              : "Unknown"}
+          </td>
+          <td className="px-4 py-2">
+            <div className="flex items-center justify-center gap-2">
+              <button
+                onClick={() => {
+                  setRetriveJobId(h.job_id);
+                  setShowPopup(true);
+                  pollJobResult(h.job_id);
+                }}
+                className="px-3 py-1 rounded bg-blue-600 text-white text-xs hover:bg-blue-700 transition"
+              >
+                Retrieve
+              </button>
+
+              <button
+                onClick={async () => {
+                  await fetch(`/api/user/deleteHistory?job_id=${h.job_id}`, {
+                    method: "DELETE",
+                  });
+                  setHistory(history.filter(item => item.job_id !== h.job_id));
+                }}
+                className="p-1 rounded-full bg-red-600 text-white hover:bg-red-700 transition"
+                aria-label="Delete"
+              >
+                <Trash size={16} />
+              </button>
+            </div>
+          </td>
+          </tr>
+        ))}
+        </tbody>
+        </table>
+      </div>
+
+  <div className="flex justify-end gap-2 mt-4">
+    <button
+      onClick={() => setHistoryPage((p) => Math.max(1, p - 1))}
+      disabled={historyPage === 1}
+      className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
+    >
+      Prev
+    </button>
+    <button
+      onClick={() => setHistoryPage((p) => p + 1)}
+      disabled={historyPage * historyPageSize >= history.length}
+      className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
+    >
+      Next
+    </button>
+  </div>
+  </div>
         ) : (
           <p className="text-gray-400 text-sm">No search history found.</p>
         )}
