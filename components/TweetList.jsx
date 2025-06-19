@@ -20,6 +20,7 @@ const linkifyOptions = {
 };
 
 export default function TweetList({ tweets, viewMode = "embed" }) {
+  const [isUpdating, setIsUpdating] = useState(false);
   const updateRunning = useRef(false);
   const tableRef = useRef();
 
@@ -118,27 +119,36 @@ export default function TweetList({ tweets, viewMode = "embed" }) {
   };
 
 const handleUpdate = async () => {
-  if (updateRunning.current) {
+  if (isUpdating) {
     console.log("⏳ Update already running, skip new click.");
     return;
   }
-  updateRunning.current = true;
+
+  setIsUpdating(true);
 
   const now = Date.now();
 
   const currentPageRows = tableRef.current?.getRowModel().rows ?? [];
   const visibleTweets = currentPageRows.map(r => r.original);
-
   const uniqueUsers = [...new Set(visibleTweets.map(t => t.tweeter))];
 
   console.log("🔍 Will update:", uniqueUsers);
 
   for (const username of uniqueUsers) {
+    const lastScan = scanTimestamps[username];
+    const followers = followersCache[username];
+    const now = Date.now();
+    const needsUpdate = !lastScan || now - lastScan > 60 * 60 * 1000 || (followers ?? 0) === 0;
+
+    if (!needsUpdate) {
+      console.log(`✅ Skip scan for ${username}, already up to date.`);
+      continue;
+    }
     await singleScan(username);
   }
 
   console.log("✅ All done!");
-  updateRunning.current = false;
+  setIsUpdating(false);
 };
 
   useEffect(() => {
@@ -188,9 +198,10 @@ const handleUpdate = async () => {
           Followers
           <button
             onClick={handleUpdate}
+            disabled={isUpdating}
             className="px-2 py-0.5 text-xs rounded bg-green-600 text-white hover:bg-green-700"
           >
-            Update
+            {isUpdating ? "Updating..." : "Update"}
           </button>
         </div>
       ),
