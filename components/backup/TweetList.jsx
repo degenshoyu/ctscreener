@@ -1,5 +1,5 @@
 // components/TweetList.jsx
-import React,{ useEffect, useState,useMemo,useRef } from "react";
+import React,{ useEffect, useState, useMemo, useRef, forwardRef, useImperativeHandle } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MessageCircle, Repeat, Heart, BarChart, BadgeCheck } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -19,9 +19,11 @@ const linkifyOptions = {
   },
 };
 
-export default function TweetList({ tweets, viewMode = "embed" }) {
+export default forwardRef(function TweetList({ tweets, viewMode = "embed", pagination, onPaginationChange }, ref) {
   const updateRunning = useRef(false);
   const tableRef = useRef();
+
+  useImperativeHandle(ref, () => tableRef.current);
 
   const [loadingUsers, setLoadingUsers] = useState({});
   const [followersCache, setFollowersCache] = useState(() => {
@@ -117,6 +119,7 @@ export default function TweetList({ tweets, viewMode = "embed" }) {
     });
   };
 
+
 const handleUpdate = async () => {
   if (updateRunning.current) {
     console.log("⏳ Update already running, skip new click.");
@@ -203,7 +206,7 @@ const handleUpdate = async () => {
         const needsUpdate = !lastScan || now - lastScan > 60 * 60 * 1000 || (followersCache[username] ?? 0) === 0;
 
           return (
-            <div className="flex items-center gap-2 w-full">
+            <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-1">
               <span className="text-base">{followers}</span>
               {isLoading && (
@@ -327,7 +330,7 @@ const handleUpdate = async () => {
   }
 
   if (viewMode === "list") {
-    return <DataTable columns={columns} data={tweets} ref={tableRef} />;
+    return <DataTable columns={columns} data={tweets} ref={tableRef} pagination={pagination} onPaginationChange={onPaginationChange} />;
   }
 
   return (
@@ -401,4 +404,4 @@ const handleUpdate = async () => {
       ))}
     </div>
   );
-}
+});

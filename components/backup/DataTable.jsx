@@ -19,20 +19,21 @@ import {
 import { Input } from "@/components/ui/input"
 import React, { useState, useImperativeHandle, forwardRef } from "react"
 
-export const DataTable= forwardRef(function DataTable ({ columns, data }, ref) {
+export const DataTable= forwardRef(function DataTable ({ columns, data, pagination, onPaginationChange}, ref) {
   const [sorting, setSorting] = useState([])
   const [globalFilter, setGlobalFilter] = useState("")
 
   const table = useReactTable({
     data,
     columns,
-    state: { sorting, globalFilter },
+    state: { sorting, globalFilter, pagination },
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
+    onPaginationChange,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onSortingChange: setSorting,
-    onGlobalFilterChange: setGlobalFilter,
   })
 
   useImperativeHandle(ref, () => table, [table]);

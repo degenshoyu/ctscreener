@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
@@ -34,6 +34,13 @@ export default function HomePage() {
   const [tweetCount, setTweetCount] = useState(0);
 
   const [viewMode, setViewMode] = useState("embed");
+
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+
+  const pagedTweets = useMemo(() => {
+    return [...tweets].slice((page - 1) * pageSize, page * pageSize);
+  }, [tweets, page]);
 
   return (
     <DashboardLayout>
@@ -212,7 +219,23 @@ export default function HomePage() {
 
         {tweets.length > 0 && (
           <div className="mt-6 max-w-full">
-            <TweetList tweets={tweets} viewMode={viewMode} />
+            <TweetList tweets={pagedTweets} viewMode={viewMode} />
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
+              >
+                Prev
+              </button>
+              <button
+                onClick={() => setPage((p) => p + 1)}
+                disabled={page * pageSize >= tweets.length}
+                className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
       </div>
