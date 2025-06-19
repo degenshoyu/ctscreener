@@ -156,12 +156,20 @@ export default function ProfilePage() {
       <div className="text-white px-4 py-8">
 
       <div className="max-w-4l mx-auto space-y-6">
-        <h1 className="text-3xl font-bold">Profile</h1>
+        <h1 className="
+          text-5xl font-extrabold mb-4
+          bg-gradient-to-br from-blue-400 via-cyan-300 to-blue-500
+          bg-clip-text text-transparent
+          drop-shadow-[0_2px_10px_rgba(96,165,250,0.3)]
+        ">Profile</h1>
 
         {authenticated && user ? (
         <>
           {/* === Profile Card === */}
-          <div className="bg-sidebar p-6 rounded-lg w-full">
+          <div className="
+            bg-white/5 border border-blue-400/20
+            backdrop-blur-lg shadow-xl rounded-2xl p-6 w-full
+          ">
             <div className="flex items-center space-x-6">
               <img
                 src={dicebearAvatar}
@@ -194,7 +202,10 @@ export default function ProfilePage() {
       </div>
 
       {/* === Search History Card === */}
-      <div className="bg-sidebar p-6 rounded-lg">
+      <div className="
+        bg-white/5 border border-blue-400/20
+        backdrop-blur-lg shadow-xl rounded-2xl p-6
+      ">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold mb-4">Search History</h2>
             <button

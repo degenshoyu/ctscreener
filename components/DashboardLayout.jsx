@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { useRouter } from "next/router";
-import { useState } from "react";
 import {
   LayoutDashboard,
   Eye,
@@ -17,6 +16,7 @@ import {
 import TooltipWrapper from "@/components/ui/TooltipWrapper";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import Topbar from "@/components/Topbar";
+import { useState, useEffect, useRef } from "react";
 
 const navItems = [
   { label: "Coin Analyst", href: "/", icon: LayoutDashboard },
@@ -29,9 +29,75 @@ const navItems = [
 export default function DashboardLayout({ children }) {
   const router = useRouter();
   const [collapsed, setCollapsed] = useLocalStorage("sidebar-collapsed", false);
+  const [mouse, setMouse] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+  const starRefs = useRef(Array.from({ length: 40 }, () => ({
+    x: Math.random() * window.innerWidth,
+    y: Math.random() * window.innerHeight,
+    vx: (Math.random() - 0.5) * 0.5,
+    vy: (Math.random() - 0.5) * 0.5,
+    hue: Math.floor(Math.random() * 360),
+    size: Math.random() * 2 + 1,
+  })));
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMouse({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
+  useEffect(() => {
+    let animationFrame;
+    const animate = () => {
+      starRefs.current.forEach((star) => {
+        star.vx += (Math.random() - 0.5) * 0.1;
+        star.vy += (Math.random() - 0.5) * 0.1
+        const dx = mouse.x - star.x;
+        const dy = mouse.y - star.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < 150) {
+          const force = (150 - dist) / 150 * 0.05;
+          star.vx += dx * force;
+          star.vy += dy * force;
+        }
+
+          star.vx *= 0.95;
+          star.vy *= 0.95;
+
+          star.x += star.vx;
+          star.y += star.vy;
+
+          if (star.x < 0) star.x = window.innerWidth;
+          if (star.x > window.innerWidth) star.x = 0;
+          if (star.y < 0) star.y = window.innerHeight;
+          if (star.y > window.innerHeight) star.y = 0;
+        });
+
+      animationFrame = requestAnimationFrame(animate);
+    };
+    animate();
+    return () => cancelAnimationFrame(animationFrame);
+  }, [mouse]);
 
   return (
-    <div className="min-h-screen flex bg-mainBg text-white">
+    <div className="min-h-screen flex bg-mainBg text-white relative overflow-hidden">
+        {/* === Fancy floating stars === */}
+    <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+      {starRefs.current.map((star, i) => (
+    <div
+      key={i}
+      className="absolute rounded-full bg-white/70 blur-[1.5px]"
+      style={{
+        top: `${star.y}px`,
+        left: `${star.x}px`,
+        width: `3px`,
+        height: `3px`,
+      }}
+    />
+  ))}
+    </div>
       {/* Sidebar */}
       <aside className={`${ collapsed ? "w-24" : "w-64" } sticky top-0 h-screen bg-mainBg/80 backdrop-blur-md border-r-[0.5px] border-blue-400/40 shadow-[4px_0_12px_-2px_rgba(96,165,250,0.1)] p-6 space-y-4 transition-all duration-200 overflow-y-auto`}>
 
@@ -70,7 +136,7 @@ export default function DashboardLayout({ children }) {
               <Link key={href} href={href} legacyBehavior>
                   {collapsed ? (
                     <a
-                        className={`block w-full flex items-center justify-center w-10 h-10 rounded-md transition-colors transition-all duration-300 ${
+                        className={`block w-full flex items-center justify-center w-10 h-10 rounded-md transition-all duration-300 ${
                           active
                           ? "bg-gradient-to-br from-blue-500/50 to-blue-400/30 text-white shadow-md"
       : "border-blue-400/30 hover:bg-blue-400/10 backdrop-blur-md"
@@ -83,7 +149,7 @@ export default function DashboardLayout({ children }) {
                     </a>
                   ) : (
                     <a
-                      className={`group flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors transition-all duration-300 ${
+                      className={`group flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
                         active
                             ? "bg-gradient-to-br from-blue-500/50 to-blue-400/30 text-white shadow-md"
   : "border-blue-400/30 hover:bg-blue-400/10 backdrop-blur-md"
