@@ -5,6 +5,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  @apply bg-mainBg text-white;
+}
+
 .wallet-adapter-button {
   height: 40px !important;
   padding: 0 16px !important;
