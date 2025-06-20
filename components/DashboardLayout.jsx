@@ -22,7 +22,7 @@ const navItems = [
   { label: "Coin Analyst", href: "/", icon: LayoutDashboard },
   { label: "API Key", href: "/api-key", icon: KeyRound },
   { label: "System Status", href: "/system-status", icon: Activity },
-  { label: "Documentation", href: "/docs", icon: Book },
+  { label: "Docs", href: "/docs", icon: Book },
   { label: "Community", href: "/community", icon: Users },
 ];
 
@@ -101,7 +101,9 @@ export default function DashboardLayout({ children }) {
   ))}
     </div>
       {/* Sidebar */}
-      <aside className={`${ collapsed ? "w-24" : "w-64" } sticky top-0 h-screen bg-mainBg/80 backdrop-blur-md border-r-[0.5px] border-blue-400/40 shadow-[4px_0_12px_-2px_rgba(96,165,250,0.1)] p-6 space-y-4 transition-all duration-200 overflow-y-auto`}>
+      <aside className={`${ collapsed ? "w-24" : "w-64" }
+        sticky top-0 h-screen bg-mainBg/80 backdrop-blur-md border-r-[0.5px] border-blue-400/40
+        shadow-[4px_0_12px_-2px_rgba(96,165,250,0.1)] p-6 space-y-4 transition-all duration-200 overflow-y-auto hidden md:block`}>
 
         {/* Toggle Button */}
         <div className="flex justify-end">
@@ -138,7 +140,7 @@ export default function DashboardLayout({ children }) {
               <Link key={href} href={href} legacyBehavior>
                   {collapsed ? (
                     <a
-                        className={`block w-full flex items-center justify-center w-10 h-10 rounded-md transition-all duration-300 ${
+                        className={` group block w-full flex items-center justify-center w-10 h-10 rounded-md transition-all duration-300 ${
                           active
                           ? "bg-gradient-to-br from-blue-500/50 to-blue-400/30 text-white shadow-md"
       : "border-blue-400/30 hover:bg-blue-400/10 backdrop-blur-md"
@@ -170,7 +172,7 @@ export default function DashboardLayout({ children }) {
 
             {/* Right content with sticky Topbar */}
       <div className="flex-1 flex flex-col">
-        {/* ✅ Topbar 固定 */}
+        {/* ✅ Topbar fix */}
         <Topbar />
 
              {/* Main content */}
@@ -178,6 +180,26 @@ export default function DashboardLayout({ children }) {
         {children}
       </main>
       </div>
+
+      {/* === Mobile Bottom Nav === */}
+<nav className="fixed bottom-0 left-0 w-full flex justify-around bg-mainBg/80 backdrop-blur-md border-t border-blue-400/30 shadow-md p-1 md:hidden z-50">
+  {navItems.map(({ label, href, icon: Icon }) => {
+    const active = router.pathname === href;
+    return (
+      <Link key={href} href={href} legacyBehavior>
+        <a
+          className={`flex-1 flex flex-col items-center justify-center py-1 text-xs font-medium transition ${
+            active ? "text-white" : "text-blue-100 hover:text-white"
+          }`}
+        >
+          <Icon className="w-6 h-6 mb-0.5" />
+          {label.split(" ")[0]}
+        </a>
+      </Link>
+    );
+  })}
+</nav>
+
     </div>
   );
 }
