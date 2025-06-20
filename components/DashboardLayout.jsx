@@ -17,6 +17,7 @@ import TooltipWrapper from "@/components/ui/TooltipWrapper";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import Topbar from "@/components/Topbar";
 import { useState, useEffect, useRef } from "react";
+import MoonButton from "@/components/MoonButton";
 
 const navItems = [
   { label: "Coin Analyst", href: "/", icon: LayoutDashboard },
@@ -83,6 +84,7 @@ export default function DashboardLayout({ children }) {
 
   return (
     <div className="min-h-screen flex bg-mainBg text-white relative">
+    <MoonButton />
         {/* === Fancy floating stars === */}
     <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
   {starRefs.current.map((star, i) => (
