@@ -22,12 +22,12 @@ export default function MoonButton() {
   };
 
   return (
-    <div className="fixed right-[20%] top-[20%] z-[9999]">
+    <div className="hidden md:block fixed right-4 bottom-20 md:right-[20%] md:top-[20%] md:bottom-auto z-[9999]">
       <button
         ref={moonRef}
         onClick={handleClick}
         className="
-          relative w-20 h-20 rounded-full 
+          relative w-20 h-20 rounded-full
           border border-yellow-100/40
           shadow-[0_0_80px_rgba(255,255,150,0.7)]
           backdrop-blur-2xl
@@ -90,4 +90,3 @@ export default function MoonButton() {
     </div>
   );
 }
-

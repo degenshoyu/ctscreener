@@ -83,7 +83,7 @@ export default function DashboardLayout({ children }) {
   }, [mouse]);
 
   return (
-    <div className="min-h-screen flex bg-mainBg text-white relative overflow-x-hidden">
+    <div className="min-h-screen flex bg-mainBg text-white relative">
     <MoonButton />
         {/* === Fancy floating stars === */}
     <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
