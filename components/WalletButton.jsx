@@ -92,7 +92,8 @@ export default function WalletButton() {
           <div
             className="
               absolute right-0 mt-2 w-48
-              bg-white/10 border border-blue-400/20
+              bg-gradient-to-br from-blue-800/40 to-blue-600/20
+              border border-blue-400/20
               backdrop-blur-xl shadow-2xl rounded-2xl
               overflow-hidden animate-fadeIn
             "

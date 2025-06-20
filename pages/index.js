@@ -16,6 +16,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import * as Select from "@radix-ui/react-select";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { List, LayoutGrid } from "lucide-react";
+import ViewModeToggle from "@/components/ViewModeToggle";
 
 export default function HomePage() {
   const { user } = usePrivy();
@@ -171,45 +172,8 @@ export default function HomePage() {
             </div>
 
             {/* === View tweets as === */}
-            <div className="mt-4 flex items-center gap-4 flex-wrap">
-              <label
-                className="
-                text-sm font-medium
-                bg-gradient-to-br from-blue-400 via-cyan-300 to-blue-500
-                bg-clip-text text-transparent
-              "
-              >
-                View tweets as
-              </label>
-
-              <button
-                onClick={() => setViewMode("embed")}
-                className={`
-                flex items-center gap-1 text-sm px-4 py-2 rounded-full
-      transition-all duration-300
-      ${
-        viewMode === "embed"
-          ? "bg-gradient-to-br from-blue-500/50 to-blue-400/30 text-white shadow-md"
-          : "border border-blue-400/30 text-blue-100 hover:bg-blue-400/10 backdrop-blur-md"
-      }
-      `}
-              >
-                <LayoutGrid size={16} /> Embed Card
-              </button>
-              <button
-                onClick={() => setViewMode("list")}
-                className={`
-      flex items-center gap-1 text-sm px-4 py-2 rounded-full
-      transition-all duration-300
-      ${
-        viewMode === "list"
-          ? "bg-gradient-to-br from-blue-500/50 to-blue-400/30 text-white shadow-md"
-          : "border border-blue-400/30 text-blue-100 hover:bg-blue-400/10 backdrop-blur-md"
-      }
-    `}
-              >
-                <List size={16} /> Tweet List
-              </button>
+            <div className="mt-6">
+              <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
             </div>
           </div>
         </TooltipProvider>

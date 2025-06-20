@@ -154,7 +154,7 @@ export default function DashboardLayout({ children }) {
                       className={`group flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
                         active
                             ? "bg-gradient-to-br from-blue-500/50 to-blue-400/30 text-white shadow-md"
-  : "border-blue-400/30 hover:bg-blue-400/10 backdrop-blur-md"
+                            : " hover:bg-blue-400/10 hover:scale-[1.05] hover:shadow-md backdrop-blur-md "
 
                       }`}
                     >
