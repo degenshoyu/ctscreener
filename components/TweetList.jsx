@@ -8,6 +8,7 @@ import linkify from 'linkifyjs';
 import Linkify from 'linkify-react';
 import 'linkify-plugin-hashtag';
 import 'linkify-plugin-mention';
+import domtoimage from "dom-to-image";
 
 const linkifyOptions = {
   target: '_blank',
@@ -19,10 +20,44 @@ const linkifyOptions = {
   },
 };
 
-export default function TweetList({ tweets, viewMode = "embed" }) {
+export default function TweetList({ tweets, viewMode = "embed", coinName, ticker, contractAddress, mode, scannedAt, jobId }) {
   const [isUpdating, setIsUpdating] = useState(false);
   const updateRunning = useRef(false);
   const tableRef = useRef();
+  const summaryRef = useRef();
+
+  const [fullTweets, setFullTweets] = useState([]);
+
+  useEffect(() => {
+    if (jobId) {
+      fetch(`/api/jobProxy?job_id=${jobId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data.tweets)) {
+            setFullTweets(data.tweets);
+          }
+        })
+        .catch(err => {
+          console.error("❌ Failed to fetch full tweets:", err);
+        });
+    }
+  }, [jobId]);
+
+  const baseTweets = fullTweets.length > 0 ? fullTweets : tweets;
+
+  const totalTweets = baseTweets.length;
+  const totalViews = baseTweets.reduce((sum, t) => sum + (t.views || 0), 0);
+  const totalEngagements = baseTweets.reduce(
+    (sum, t) => sum + (t.retweets || 0) + (t.likes || 0) + (t.replies || 0),
+      0
+    );
+  const verifiedTweets = baseTweets.filter((t) => t.isVerified);
+  const totalTweetsVerified = verifiedTweets.length;
+  const totalViewsVerified = verifiedTweets.reduce((sum, t) => sum + (t.views || 0), 0);
+  const totalEngagementsVerified = verifiedTweets.reduce(
+    (sum, t) => sum + (t.retweets || 0) + (t.likes || 0) + (t.replies || 0),
+      0
+    );
 
   const [loadingUsers, setLoadingUsers] = useState({});
   const [followersCache, setFollowersCache] = useState(() => {
@@ -138,7 +173,7 @@ const handleUpdate = async () => {
     const lastScan = scanTimestamps[username];
     const followers = followersCache[username];
     const now = Date.now();
-    const needsUpdate = !lastScan || now - lastScan > 60 * 60 * 1000 || (followers ?? 0) === 0;
+    const needsUpdate = !lastScan || now - lastScan > 24 * 60 * 60 * 1000 || (followers ?? 0) === 0;
 
     if (!needsUpdate) {
       console.log(`✅ Skip scan for ${username}, already up to date.`);
@@ -338,7 +373,82 @@ const handleUpdate = async () => {
   }
 
   if (viewMode === "list") {
-    return <DataTable columns={columns} data={tweets} ref={tableRef} />;
+    return (
+      <>
+      <div ref={summaryRef} className="w-full max-w-3xl mb-6 p-6 rounded-3xl border border-blue-400/20 bg-gradient-to-br from-blue-800/30 to-blue-700/20 shadow-2xl backdrop-blur-lg">
+<div className="mb-4">
+  <h3 className="text-2xl font-bold text-white flex items-center gap-2 mb-2">
+    📊 Statistic Summary
+  </h3>
+  <div className="text-sm text-blue-200">
+    🗂️ <strong>Mode:</strong> {mode} &nbsp; | &nbsp; ⏱️ <strong>Scanned:</strong>{" "}
+    {new Date(scannedAt).toLocaleString(undefined, { timeZoneName: "short" })}
+  </div>
+</div>
+
+  {/* === Top: Coin & Contract === */}
+  <div className="space-y-2 mb-6">
+    <p className="text-blue-100/80">
+      🪙 <span className="font-semibold text-white">Coin:</span>{" "}
+      <span className="font-bold text-blue-200">{coinName}</span>{" "}
+      <span className="text-blue-300">({ticker})</span>
+    </p>
+    <p className="text-blue-100/80 break-all">
+      🔗 <span className="font-semibold text-white">Contract:</span>{" "}
+      <span className="text-blue-300">{contractAddress || "N/A"}</span>
+    </p>
+  </div>
+
+  {/* === Bottom: Two Small Cards === */}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {/* Left Card */}
+    <div className="bg-white/5 border border-blue-400/10 rounded-2xl p-6 backdrop-blur-md shadow-lg hover:scale-[1.02] transition">
+      <p className="text-blue-300 font-semibold mb-2">📌 Total Tweets</p>
+      <p className="text-white text-2xl font-bold mb-2">{totalTweets}</p>
+      <p className="text-blue-100">👀 {formatNumber(totalViews)} Views</p>
+      <p className="text-blue-100">💬 {formatNumber(totalEngagements)} Engagements</p>
+    </div>
+
+    {/* Right Card */}
+    <div className="bg-white/5 border border-green-400/10 rounded-2xl p-6 backdrop-blur-md shadow-lg hover:scale-[1.02] transition">
+      <p className="text-green-300 font-semibold mb-2">✅ Verified Tweets</p>
+      <p className="text-white text-2xl font-bold mb-2">{totalTweetsVerified}</p>
+      <p className="text-green-100">👀 {formatNumber(totalViewsVerified)} Views</p>
+      <p className="text-green-100">💬 {formatNumber(totalEngagementsVerified)} Engagements</p>
+    </div>
+  </div>
+</div>
+  <button
+    onClick={async () => {
+      const node = summaryRef.current;
+      const scale = 2;
+      domtoimage.toPng(node, {
+        width: node.offsetWidth * scale,
+        height: node.offsetHeight * scale,
+        style: {
+          transform: `scale(${scale})`,
+          transformOrigin: "top left",
+          background: "#0f172a",
+        }
+      })
+  .then(dataUrl => {
+    const link = document.createElement("a");
+    link.href = dataUrl;
+    link.download = "ctScreener_summary.png";
+    link.click();
+  })
+  .catch(err => {
+    console.error("Failed to export image:", err);
+  });
+    }}
+    className="px-3 py-1.5 text-sm rounded-full bg-blue-600 hover:bg-blue-700 text-white transition"
+  >
+    📸 Save as Image
+  </button>
+
+        <DataTable columns={columns} data={tweets} ref={tableRef} />
+      </>
+    );
   }
 
   return (

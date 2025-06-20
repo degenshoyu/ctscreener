@@ -45,6 +45,8 @@ export default function HomePage() {
     return [...tweets].slice((page - 1) * pageSize, page * pageSize);
   }, [tweets, page]);
 
+  const [jobId, setJobId] = useState(null);
+
   return (
     <DashboardLayout>
       <Head>
@@ -89,6 +91,7 @@ export default function HomePage() {
             onTweetCount={setTweetCount}
             activeTab={activeTab}
             shillerWindow={shillerWindow}
+            setJobId={setJobId}
           />
         </div>
 
@@ -222,7 +225,20 @@ export default function HomePage() {
 
         {tweets.length > 0 && (
           <div className="mt-6 max-w-full">
-            <TweetList tweets={pagedTweets} viewMode={viewMode} />
+            <TweetList
+              tweets={pagedTweets}
+              viewMode={viewMode}
+              coinName={tokenInfo?.name || "Unknown"}
+              ticker={tokenInfo?.symbol || ""}
+              contractAddress={tokenInfo?.address || ""}
+              mode={
+                activeTab === "shiller"
+                  ? `Top Shiller (${shillerWindow})`
+                  : "Early Callers"
+              }
+              scannedAt={new Date().toISOString()}
+              jobId={jobId}
+            />
             <div className="flex justify-end gap-2 mt-4">
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}

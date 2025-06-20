@@ -27,6 +27,8 @@
     "classnames": "^2.5.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "dom-to-image": "^2.6.0",
+    "dom-to-image-more": "^3.6.0",
     "linkify-plugin-hashtag": "^4.3.1",
     "linkify-plugin-mention": "^4.3.1",
     "linkify-react": "^4.3.1",

@@ -428,26 +428,52 @@ export default function ProfilePage() {
 
   <div className="flex items-center gap-4 mb-4">
     <label className="text-sm text-gray-400">View Mode:</label>
-      <button
-        onClick={() => setRetriveViewMode("embed")}
-        className={`flex items-center justify-center gap-2 min-w-[120px] px-4 py-2 rounded text-sm ${
-          retriveViewMode === "embed" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"
-        }`}
-      >
-        <LayoutGrid size={16} /> Embed Card
-      </button>
-      <button
-        onClick={() => setRetriveViewMode("list")}
-        className={`flex items-center justify-center gap-2 min-w-[120px] px-4 py-2 rounded text-sm ${
-          retriveViewMode === "list" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300"
-        }`}
-      >
-        <List size={16} /> Tweet List
-      </button>
+<button
+  onClick={() => setRetriveViewMode("embed")}
+  className={`
+    flex items-center justify-center gap-2 min-w-[120px] px-4 py-2 rounded-full text-sm font-medium transition-all duration-300
+    ${
+      retriveViewMode === "embed"
+        ? "bg-gradient-to-br from-blue-500/50 to-blue-400/30 text-white shadow-md"
+        : "border border-blue-400/30 text-blue-100 hover:bg-blue-400/10 backdrop-blur-md"
+    }
+  `}
+>
+  <LayoutGrid size={16} /> Embed Card
+</button>
+<button
+  onClick={() => setRetriveViewMode("list")}
+  className={`
+    flex items-center justify-center gap-2 min-w-[120px] px-4 py-2 rounded-full text-sm font-medium transition-all duration-300
+    ${
+      retriveViewMode === "list"
+        ? "bg-gradient-to-br from-blue-500/50 to-blue-400/30 text-white shadow-md"
+        : "border border-blue-400/30 text-blue-100 hover:bg-blue-400/10 backdrop-blur-md"
+    }
+  `}
+>
+  <List size={16} /> Tweet List
+</button>
+
     </div>
 
   <div className="w-full overflow-x-auto">
-    <TweetList tweets={sortedPagedTweets} viewMode={retriveViewMode} />
+    <TweetList
+      tweets={sortedPagedTweets}
+      viewMode={retriveViewMode}
+      coinName={retriveData.tokenInfo?.name || "Unknown"}
+      ticker={retriveData.tokenInfo?.symbol || ""}
+      contractAddress={retriveData.tokenInfo?.address || retriveData.tokenInfo?.mint || ""}
+      mode={
+        history.find((h) => h.job_id === retriveJobId)?.mode === "shiller"
+          ? `Top Shiller (${history.find((h) => h.job_id === retriveJobId)?.window})`
+          : "Early Callers"
+      }
+      scannedAt={
+        history.find((h) => h.job_id === retriveJobId)?.created_at || new Date().toISOString()
+      }
+      jobId={retriveJobId}
+    />
   </div>
 
   <div className="flex justify-end gap-2 mt-4">

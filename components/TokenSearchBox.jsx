@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 
-export default function TokenSearchBox({ address, setAddress, walletAddress, isLoading, setIsLoading, onTokenInfo, onTweets, onSearch,onTweetCount, activeTab, shillerWindow }) {
+export default function TokenSearchBox({ address, setAddress, walletAddress, isLoading, setIsLoading, onTokenInfo, onTweets, onSearch,onTweetCount, activeTab, shillerWindow, setJobId }) {
   console.log("🧩 TokenSearchBox mounted");
   const [error, setError] = useState("");
   const [earliestTweets, setEarliestTweets] = useState([]);
-  const [jobId, setJobId] = useState(null);
+  // const [jobId, setJobId] = useState(null);
   const [loadingTweets, setLoadingTweets] = useState(false);
   const { toast } = useToast();
   const [isSearching, setIsSearching] = useState(false);
@@ -223,6 +223,7 @@ export default function TokenSearchBox({ address, setAddress, walletAddress, isL
       if (twitterJson.job_id) {
         console.log("Twitter scan started. Job ID:", twitterJson.job_id);
         setLoadingTweets(true);
+        setJobId(twitterJson.job_id);
         pollJobResult(twitterJson.job_id);
     }
   } catch (err) {
