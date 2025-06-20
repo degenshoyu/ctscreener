@@ -22,7 +22,7 @@ export default function MoonButton() {
   };
 
   return (
-    <div className="hidden md:block fixed right-4 bottom-20 md:right-[20%] md:top-[20%] md:bottom-auto z-[9999]">
+    <div className="show-in-landscape fixed right-[20%] top-[20%] z-[9999]">
       <button
         ref={moonRef}
         onClick={handleClick}
@@ -85,6 +85,16 @@ export default function MoonButton() {
         .animate-starOrbit3 {
           animation: starOrbit3 10s linear infinite;
           transform-origin: center;
+        }
+
+        .show-in-landscape {
+          display: none;
+        }
+
+        @media (orientation: landscape) {
+          .show-in-landscape {
+          display: block;
+          }
         }
       `}</style>
     </div>
