@@ -301,6 +301,7 @@ export default function TokenSearchBox({ address, setAddress, walletAddress, isL
     `}
   >
     Include ticker
+    <span className="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-yellow-400 text-black">testing</span>
   </button>
 </div>
         {error && <p className="text-red-500 text-sm ml-2">{error}</p>}
