@@ -230,6 +230,7 @@ export default function ProfilePage() {
         <tr>
           <th className="px-4 py-2 text-left">Token</th>
           <th className="px-4 py-2 text-left">Mode</th>
+          <th className="px-4 py-2 text-left">Include Ticker</th>
           <th className="px-4 py-2 text-left">Status</th>
           <th className="px-4 py-2 text-left">Date</th>
           <th className="px-4 py-2 text-left">Actions</th>
@@ -246,6 +247,17 @@ export default function ProfilePage() {
           </td>
           <td className="px-4 py-2">
             {h.mode === "shiller" ? `Top shillers (${h.window})` : "Early callers"}
+          </td>
+          <td className="px-4 py-2">
+            {h.includeTicker ? (
+              <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-green-600 text-white">
+                ON
+              </span>
+            ) : (
+              <span className="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-gray-700 text-gray-300">
+                OFF
+              </span>
+            )}
           </td>
           <td className="px-4 py-2">
             <span

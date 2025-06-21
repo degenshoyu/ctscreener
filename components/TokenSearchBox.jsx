@@ -6,10 +6,10 @@ export default function TokenSearchBox({ address, setAddress, walletAddress, isL
   console.log("🧩 TokenSearchBox mounted");
   const [error, setError] = useState("");
   const [earliestTweets, setEarliestTweets] = useState([]);
-  // const [jobId, setJobId] = useState(null);
   const [loadingTweets, setLoadingTweets] = useState(false);
   const { toast } = useToast();
   const [isSearching, setIsSearching] = useState(false);
+  const [includeTicker, setIncludeTicker] = useState(false);
 
   useEffect(() => {
     if (activeTab === "shiller" && !walletAddress) {
@@ -213,7 +213,8 @@ export default function TokenSearchBox({ address, setAddress, walletAddress, isL
           pairCreatedAt: match.pairCreatedAt,
           tokenInfo,
           mode: activeTab,
-          window: activeTab === "shiller" ? shillerWindow : null
+          window: activeTab === "shiller" ? shillerWindow : null,
+          includeTicker,
         }),
       });
 
@@ -242,7 +243,6 @@ export default function TokenSearchBox({ address, setAddress, walletAddress, isL
   return (
     <div className="w-full mb-6">
 
-    {/* 原始输入框 + 搜索按钮区域 */}
     <div className="
       flex items-center
       rounded-full
@@ -287,8 +287,23 @@ export default function TokenSearchBox({ address, setAddress, walletAddress, isL
       >
         {isSearching ? "Searching..." : "Search"}
       </button>
-      {error && <p className="text-red-500 text-sm ml-2">{error}</p>}
     </div>
+
+<div className="mt-3 flex">
+  <button
+    onClick={() => setIncludeTicker(!includeTicker)}
+    className={`
+      px-3 py-1.5 rounded-full font-medium text-xs transition-all duration-300
+      ${includeTicker
+        ? "bg-gradient-to-br from-blue-500/50 to-blue-400/30 text-white shadow-md"
+        : "border border-blue-400/30 text-blue-100 hover:bg-blue-400/10 backdrop-blur-md"
+      }
+    `}
+  >
+    Include ticker
+  </button>
+</div>
+        {error && <p className="text-red-500 text-sm ml-2">{error}</p>}
     </div>
 );
 }

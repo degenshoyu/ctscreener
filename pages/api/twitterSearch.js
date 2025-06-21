@@ -11,11 +11,19 @@ export default async function handler(req, res) {
 
   if (req.method !== "POST") return res.status(405).end();
 
-  const { tokenAddress, pairCreatedAt, tokenInfo, mode, window } = req.body;
+  const {
+    tokenAddress,
+    pairCreatedAt,
+    tokenInfo,
+    mode,
+    window,
+    includeTicker,
+  } = req.body;
   const bearerToken = process.env.TWITTER_SCANNER_SECRET;
   console.log("📥 Received params:", {
     tokenAddress,
     pairCreatedAt,
+    tokenSymbol: tokenInfo?.symbol,
     mode,
     window,
   });
@@ -30,6 +38,16 @@ export default async function handler(req, res) {
   let apiPath = "";
   let body = {};
 
+  let keyword = [tokenAddress];
+  if (includeTicker) {
+    const symbol = tokenInfo?.symbol || "";
+    if (symbol.length > 6) {
+      keyword.push(`#${symbol}`);
+    } else {
+      keyword.push(`$${symbol}`);
+    }
+  }
+
   if (mode === "shiller") {
     apiPath = "/search";
 
@@ -43,7 +61,7 @@ export default async function handler(req, res) {
     const start_date = start.toISOString().split("T")[0];
 
     body = {
-      keyword: tokenAddress,
+      keyword,
       start_date,
       end_date,
       mode: "shiller",
@@ -54,7 +72,7 @@ export default async function handler(req, res) {
       .toISOString()
       .split("T")[0];
     body = {
-      keyword: tokenAddress,
+      keyword,
       end_date: until,
       start_date: "",
       mode: "shiller",
@@ -90,6 +108,7 @@ export default async function handler(req, res) {
         token_info: tokenInfo || null,
         mode,
         window: mode === "shiller" ? window : null,
+        includeTicker,
         job_id: data.job_id,
         created_at: new Date(),
       });
