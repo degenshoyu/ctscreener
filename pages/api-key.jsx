@@ -5,11 +5,13 @@ import Head from "next/head";
 import DashboardLayout from "@/components/DashboardLayout";
 import { usePrivy } from "@privy-io/react-auth";
 import { useSolanaWallets } from "@privy-io/react-auth/solana";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ApiKeyPage() {
   const { authenticated } = usePrivy();
   const { wallets } = useSolanaWallets();
   const address = wallets[0]?.address;
+  const { toast } = useToast();
 
   const [apiKey, setApiKey] = useState("-");
   const [plan, setPlan] = useState("-");
@@ -23,7 +25,11 @@ export default function ApiKeyPage() {
 
   useEffect(() => {
     if (!authenticated || !address) {
-      console.log("⏳ Waiting for wallet — no request-key fetch");
+      toast({
+        title: "Wallet Not Connected",
+        description: "Please connect your wallet to generate your API Key.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -38,7 +44,11 @@ export default function ApiKeyPage() {
         setBalance(balData.balance || 0);
 
         if (balData.balance < 10_000) {
-          setError("❌ You need at least 10,000 $ctS to generate an API Key.");
+          toast({
+            title: "Insufficient $ctS",
+            description: "You need at least 10,000 $ctS to generate an API Key.",
+            variant: "destructive",
+          });
           return;
         }
 
