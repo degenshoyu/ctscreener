@@ -19,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input"
 import React, { useState, useImperativeHandle, forwardRef } from "react"
 
-export const DataTable= forwardRef(function DataTable ({ columns, data }, ref) {
+export const DataTable= forwardRef(function DataTable ({ columns, data, hideSearch }, ref) {
   const [sorting, setSorting] = useState([])
   const [globalFilter, setGlobalFilter] = useState("")
 
@@ -39,6 +39,7 @@ export const DataTable= forwardRef(function DataTable ({ columns, data }, ref) {
 
   return (
     <div>
+    {!hideSearch && (
       <div className="flex items-center py-4">
         <Input
           placeholder="Search tweets..."
@@ -47,6 +48,7 @@ export const DataTable= forwardRef(function DataTable ({ columns, data }, ref) {
           className="max-w-sm bg-mainBg border-sidebarBorder text-zinc-200 placeholder:text-zinc-400"
         />
       </div>
+    )}
       <div className="rounded-md border border-sidebarBorder">
         <Table>
           <TableHeader>

@@ -25,8 +25,8 @@ export default function TweetList({ tweets, viewMode = "embed", coinName, ticker
   const updateRunning = useRef(false);
   const tableRef = useRef();
   const summaryRef = useRef();
-
   const [fullTweets, setFullTweets] = useState([]);
+  const [showRanking, setShowRanking] = useState(false);
 
   useEffect(() => {
     if (jobId) {
@@ -58,6 +58,33 @@ export default function TweetList({ tweets, viewMode = "embed", coinName, ticker
     (sum, t) => sum + (t.retweets || 0) + (t.likes || 0) + (t.replies || 0),
       0
     );
+  const engagementRate = totalViews > 0 ? (totalEngagements / totalViews) : 0;
+  const engagementRateVerified = totalViewsVerified > 0 ? (totalEngagementsVerified / totalViewsVerified) : 0;
+
+  const tweeterStats = {};
+  baseTweets.forEach((t) => {
+    const name = t.tweeter;
+    if (!tweeterStats[name]) {
+      tweeterStats[name] = {
+        tweeter: name,
+        tweets: 0,
+        views: 0,
+        engagement: 0,
+        er: 0,
+        score: 0,
+      };
+    }
+    tweeterStats[name].tweets += 1;
+    tweeterStats[name].views += t.views || 0;
+    tweeterStats[name].engagement += (t.likes || 0) + (t.retweets || 0) + (t.replies || 0);
+  });
+  Object.values(tweeterStats).forEach((s) => {
+    s.er = s.views > 0 ? s.engagement / s.views : 0;
+    s.score = s.views * (1 + s.er) * Math.log(s.tweets + 1);
+  });
+  const tweeterRanking = Object.values(tweeterStats)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 10);
 
   const [loadingUsers, setLoadingUsers] = useState({});
   const [followersCache, setFollowersCache] = useState(() => {
@@ -331,6 +358,16 @@ const handleUpdate = async () => {
       cell: ({ row }) => formatNumber(row.original.replies ?? 0),
     },
     {
+      accessorKey: "engagementRate",
+      header: "ER %",
+      cell: ({ row }) => {
+        const views = row.original.views ?? 0;
+        const engagement = (row.original.retweets ?? 0) + (row.original.likes ?? 0) + (row.original.replies ?? 0);
+        const rate = views > 0 ? (engagement / views) * 100 : 0;
+        return `${rate.toFixed(2)}%`;
+      },
+    },
+    {
       accessorKey: "datetime",
       header: "Publish Date",
       cell: ({ row }) => new Date(row.original.datetime).toLocaleString(),
@@ -368,6 +405,53 @@ const handleUpdate = async () => {
     },
   ], [scanTimestamps, followersCache, loadingUsers]);
 
+
+const rankingColumns = [
+  {
+    accessorKey: "rank",
+    header: "Rank",
+    cell: ({ row }) => `#${row.index + 1}`,
+  },
+  {
+    accessorKey: "tweeter",
+    header: "Tweeter",
+    cell: ({ row }) => (
+      <a
+        href={`https://twitter.com/${row.original.tweeter}`}
+        target="_blank"
+        className="text-blue-400 hover:underline"
+      >
+        @{row.original.tweeter}
+      </a>
+    ),
+  },
+  {
+    accessorKey: "tweets",
+    header: "Tweets",
+    cell: ({ row }) => row.original.tweets,
+  },
+  {
+    accessorKey: "views",
+    header: "Views",
+    cell: ({ row }) => formatNumber(row.original.views),
+  },
+  {
+    accessorKey: "engagement",
+    header: "Engagement",
+    cell: ({ row }) => formatNumber(row.original.engagement),
+  },
+  {
+    accessorKey: "er",
+    header: "ER %",
+    cell: ({ row }) => `${(row.original.er * 100).toFixed(2)}%`,
+  },
+  {
+    accessorKey: "score",
+    header: "Score",
+    cell: ({ row }) => row.original.score.toFixed(2),
+  },
+];
+
   if (!tweets || tweets.length === 0) {
     return <p className="text-zinc-400 text-sm">No tweets found.</p>;
   }
@@ -377,9 +461,27 @@ const handleUpdate = async () => {
       <>
       <div ref={summaryRef} className="w-full max-w-3xl mb-6 p-6 rounded-3xl border border-blue-400/20 bg-gradient-to-br from-blue-800/30 to-blue-700/20 shadow-2xl backdrop-blur-lg">
 <div className="mb-4">
-  <h3 className="text-2xl font-bold text-white flex items-center gap-2 mb-2">
-    📊 Statistic Summary
+<div className="flex items-center gap-3 mb-4">
+  <h3 className="text-2xl font-bold">
+    {showRanking ? "🏅 Tweeter Ranking" : "📊 Statistic Summary"}
   </h3>
+  <button
+    onClick={() => setShowRanking(!showRanking)}
+    className={`relative inline-flex h-6 w-11 rounded-full transition ${
+      showRanking ? 'bg-green-500' : 'bg-blue-500'
+    }`}
+  >
+    <span
+      className={`absolute top-0 bottom-0 my-auto h-5 w-5 rounded-full bg-white shadow transition ${
+      showRanking ? 'translate-x-5' : 'translate-x-1'
+    }`}
+    />
+  </button>
+  <span className="text-xs text-zinc-400">
+    Click toggle
+  </span>
+</div>
+
   <div className="text-sm text-blue-200">
     🗂️ <strong>Mode:</strong> {mode} &nbsp; | &nbsp; ⏱️ <strong>Scanned:</strong>{" "}
     {new Date(scannedAt).toLocaleString(undefined, { timeZoneName: "short" })}
@@ -400,23 +502,27 @@ const handleUpdate = async () => {
   </div>
 
   {/* === Bottom: Two Small Cards === */}
+{showRanking ? (
+  <DataTable columns={rankingColumns} data={tweeterRanking} hideSearch />
+) : (
   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-    {/* Left Card */}
     <div className="bg-white/5 border border-blue-400/10 rounded-2xl p-6 backdrop-blur-md shadow-lg hover:scale-[1.02] transition">
       <p className="text-blue-300 font-semibold mb-2">📌 Total Tweets</p>
       <p className="text-white text-2xl font-bold mb-2">{totalTweets}</p>
       <p className="text-blue-100">👀 {formatNumber(totalViews)} Views</p>
       <p className="text-blue-100">💬 {formatNumber(totalEngagements)} Engagements</p>
+      <p className="text-blue-100">📈 ER: {(engagementRate * 100).toFixed(2)}%</p>
     </div>
-
-    {/* Right Card */}
     <div className="bg-white/5 border border-green-400/10 rounded-2xl p-6 backdrop-blur-md shadow-lg hover:scale-[1.02] transition">
       <p className="text-green-300 font-semibold mb-2">✅ Verified Tweets</p>
       <p className="text-white text-2xl font-bold mb-2">{totalTweetsVerified}</p>
       <p className="text-green-100">👀 {formatNumber(totalViewsVerified)} Views</p>
       <p className="text-green-100">💬 {formatNumber(totalEngagementsVerified)} Engagements</p>
+      <p className="text-green-100">📈 ER: {(engagementRateVerified * 100).toFixed(2)}%</p>
     </div>
   </div>
+)}
+
 </div>
   <button
     onClick={async () => {
