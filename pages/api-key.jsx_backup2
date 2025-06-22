@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Head from "next/head";
 import DashboardLayout from "@/components/DashboardLayout";
 import { usePrivy } from "@privy-io/react-auth";
@@ -22,23 +22,16 @@ export default function ApiKeyPage() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showKey, setShowKey] = useState(false);
-  const backendUrl = "https://api.ctscreener.xyz";
-  const hasWarned = useRef(false);
 
   useEffect(() => {
     if (!authenticated || !address) {
-      if (!hasWarned.current) {
-        toast({
-          title: "Wallet Not Connected",
-          description: "Please connect your wallet to generate your API Key.",
-          variant: "destructive",
-        });
-        hasWarned.current = true;
-      }
+      toast({
+        title: "Wallet Not Connected",
+        description: "Please connect your wallet to generate your API Key.",
+        variant: "destructive",
+      });
       return;
     }
-
-    hasWarned.current = false;
 
     const run = async () => {
       console.log("🚀 Running API Key fetch with wallet:", address);
@@ -61,7 +54,7 @@ export default function ApiKeyPage() {
 
         let token = localStorage.getItem(`ct_api_key_${address}`);
         if (!token) {
-          const res = await fetch(`${backendUrl}/api/request-key`, {
+          const res = await fetch("/api/request-key", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ wallet: address }),
@@ -79,7 +72,7 @@ export default function ApiKeyPage() {
         const payload = JSON.parse(atob(token.split(".")[1]));
         setPlan(payload.plan || "-");
 
-        const statusRes = await fetch(`${backendUrl}/api/user-status`, {
+        const statusRes = await fetch("/api/user-status", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const statusData = await statusRes.json();
