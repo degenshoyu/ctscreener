@@ -9,7 +9,7 @@ export default function SystemStatusPage() {
     const fetchStatus = async () => {
       try {
         const [api] = await Promise.all([
-          fetch("/api/apiStatusProxy").then((r) => r.json()),
+          fetch(`https://api.ctscreener.xyz/api/status`).then((r) => r.json()),
         ]);
         setStatusData([api])
       } catch (err) {
@@ -80,8 +80,8 @@ export default function SystemStatusPage() {
   <span
     className={`
       px-2 py-0.5 rounded-full text-xs font-semibold
-      ${browser.inUse 
-        ? "bg-yellow-500/20 text-yellow-300" 
+      ${browser.inUse
+        ? "bg-yellow-500/20 text-yellow-300"
         : "bg-green-500/20 text-green-300"
       }
     `}

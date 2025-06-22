@@ -75,7 +75,7 @@ export default async function handler(req, res) {
       keyword,
       end_date: until,
       start_date: "",
-      mode: "shiller",
+      mode: "early",
     };
   }
 
