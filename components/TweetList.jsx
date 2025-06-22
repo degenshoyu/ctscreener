@@ -477,9 +477,6 @@ const rankingColumns = [
     }`}
     />
   </button>
-  <span className="text-xs text-zinc-400">
-    Click toggle
-  </span>
 </div>
 
   <div className="text-sm text-blue-200">
