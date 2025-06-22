@@ -9,7 +9,7 @@ export default function SystemStatusPage() {
     const fetchStatus = async () => {
       try {
         const [api] = await Promise.all([
-          fetch(`https://api.ctscreener.xyz/api/status`).then((r) => r.json()),
+          fetch(`/api/apiStatusProxy`).then((r) => r.json()),
         ]);
         setStatusData([api])
       } catch (err) {
