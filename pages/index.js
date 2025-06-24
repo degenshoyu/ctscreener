@@ -151,27 +151,6 @@ export default function HomePage() {
                   </div>
                 )}
               </div>
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    disabled
-                    className="
-              px-4 py-2 rounded-full font-medium
-              border border-blue-200/20 text-blue-200
-              backdrop-blur-md cursor-not-allowed opacity-50
-            "
-                  >
-                    High-impact callers 🚧
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent
-                  side="top"
-                  className="text-sm font-semibold bg-yellow-500 text-black px-3 py-2 rounded-md shadow-lg"
-                >
-                  🚧 Coming soon
-                </TooltipContent>
-              </Tooltip>
             </div>
 
             {/* === View tweets as === */}

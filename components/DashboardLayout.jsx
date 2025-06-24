@@ -31,6 +31,7 @@ export default function DashboardLayout({ children }) {
   const router = useRouter();
   const [collapsed, setCollapsed] = useLocalStorage("sidebar-collapsed", false);
   const [mouse, setMouse] = useState({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+
   const starRefs = useRef(Array.from({ length: 40 }, () => ({
     x: Math.random() * window.innerWidth,
     y: Math.random() * window.innerHeight,
@@ -39,6 +40,25 @@ export default function DashboardLayout({ children }) {
     hue: Math.floor(Math.random() * 360),
     size: Math.random() * 2 + 1,
   })));
+  const meteorsRef = useRef([]);
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      meteorsRef.current.push({
+        x: window.innerWidth + 50,
+        y: -50,
+        vx: -(Math.random() * 1.5 + 0.5),
+        vy: Math.random() * 1.5 + 0.5,
+        length: Math.random() * 100 + 50,
+        hue: Math.floor(Math.random() * 360),
+      });
+      if (meteorsRef.current.length > 3) {
+        meteorsRef.current.shift();
+      }
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -49,38 +69,85 @@ export default function DashboardLayout({ children }) {
   }, []);
 
   useEffect(() => {
+  let animationFrame;
+  const animateStars = () => {
+    starRefs.current.forEach((star) => {
+      star.vx += (Math.random() - 0.5) * 0.1;
+      star.vy += (Math.random() - 0.5) * 0.1;
+
+      const dx = mouse.x - star.x;
+      const dy = mouse.y - star.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < 150) {
+        const force = (150 - dist) / 150 * 0.05;
+        star.vx += dx * force;
+        star.vy += dy * force;
+      }
+
+      star.vx *= 0.95;
+      star.vy *= 0.95;
+
+      star.x += star.vx;
+      star.y += star.vy;
+
+      if (star.x < 0) star.x = window.innerWidth;
+      if (star.x > window.innerWidth) star.x = 0;
+      if (star.y < 0) star.y = window.innerHeight;
+      if (star.y > window.innerHeight) star.y = 0;
+    });
+
+    animationFrame = requestAnimationFrame(animateStars);
+  };
+  animateStars();
+  return () => cancelAnimationFrame(animationFrame);
+}, [mouse]);
+
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
     let animationFrame;
     const animate = () => {
-      starRefs.current.forEach((star) => {
-        star.vx += (Math.random() - 0.5) * 0.1;
-        star.vy += (Math.random() - 0.5) * 0.1
-        const dx = mouse.x - star.x;
-        const dy = mouse.y - star.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        if (dist < 150) {
-          const force = (150 - dist) / 150 * 0.05;
-          star.vx += dx * force;
-          star.vy += dy * force;
-        }
+      meteorsRef.current.forEach((meteor) => {
+        meteor.x += meteor.vx;
+        meteor.y += meteor.vy;
 
-          star.vx *= 0.95;
-          star.vy *= 0.95;
+        const tailX = meteor.x - meteor.vx * meteor.length;
+        const tailY = meteor.y - meteor.vy * meteor.length;
 
-          star.x += star.vx;
-          star.y += star.vy;
+        const grad = ctx.createLinearGradient(meteor.x, meteor.y, tailX, tailY);
+        grad.addColorStop(0, `hsla(${meteor.hue}, 100%, 80%, 1)`);
+        grad.addColorStop(1, `hsla(${meteor.hue}, 100%, 80%, 0)`);
 
-          if (star.x < 0) star.x = window.innerWidth;
-          if (star.x > window.innerWidth) star.x = 0;
-          if (star.y < 0) star.y = window.innerHeight;
-          if (star.y > window.innerHeight) star.y = 0;
-        });
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 4;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = `hsla(${meteor.hue}, 100%, 80%, 0.8)`;
 
+        ctx.beginPath();
+        ctx.moveTo(meteor.x, meteor.y);
+        ctx.lineTo(tailX, tailY);
+        ctx.stroke();
+
+        ctx.shadowBlur = 0;
+        ctx.shadowColor = 'transparent';
+      });
       animationFrame = requestAnimationFrame(animate);
     };
     animate();
     return () => cancelAnimationFrame(animationFrame);
-  }, [mouse]);
+    window.removeEventListener("resize", resize);
+  }, []);
 
   return (
     <div className="min-h-screen flex bg-mainBg text-white relative">
@@ -101,7 +168,9 @@ export default function DashboardLayout({ children }) {
       }}
     />
   ))}
-    </div>
+  <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+</div>
+
       {/* Sidebar */}
       <aside className={`${ collapsed ? "w-24" : "w-64" }
         sticky top-0 h-screen bg-mainBg/80 backdrop-blur-md border-r-[0.5px] border-blue-400/40

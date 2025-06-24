@@ -6,6 +6,22 @@ import { Toaster } from "@/components/ui/toaster";
 
 const PRIVY_APP_ID = "cmbunw3nq009gjr0m3z2c1sfi";
 
+const siteURL =
+  typeof window !== "undefined"
+    ? window.location.origin
+    : process.env.NODE_ENV === "production"
+    ? "https://www.ctscreener.xyz"
+    : "http://localhost:3001";
+
+const connectors = toSolanaWalletConnectors({
+  metadata: {
+    name: "ctScreener",
+    description: "Crypto Twitter Screener",
+    url: siteURL,
+    icons: ["https://www.ctscreener.xyz/icon.png"],
+  },
+});
+
 export default function AppInner({ Component, pageProps }) {
   return (
     <PrivyProvider
@@ -20,7 +36,7 @@ export default function AppInner({ Component, pageProps }) {
         },
         externalWallets: {
           solana: {
-            connectors: toSolanaWalletConnectors(),
+            connectors,
           },
         },
       }}
