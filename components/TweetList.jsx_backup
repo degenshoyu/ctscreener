@@ -28,8 +28,6 @@ export default function TweetList({ tweets, viewMode = "embed", coinName, ticker
   const summaryRef = useRef();
   const [fullTweets, setFullTweets] = useState([]);
   const [showRanking, setShowRanking] = useState(false);
-  const [page, setPage] = useState(1);
-  const pageSize = 10;
 
   useEffect(() => {
     if (jobId) {
@@ -47,10 +45,6 @@ export default function TweetList({ tweets, viewMode = "embed", coinName, ticker
   }, [jobId]);
 
   const baseTweets = fullTweets.length > 0 ? fullTweets : tweets;
-
-  const paged = useMemo(() => {
-    return baseTweets.slice((page - 1) * pageSize, page * pageSize);
-  }, [baseTweets, page]);
 
   const totalTweets = baseTweets.length;
   const totalViews = baseTweets.reduce((sum, t) => sum + (t.views || 0), 0);
@@ -474,37 +468,14 @@ const rankingColumns = [
           mode={mode}
           scannedAt={scannedAt}
         />
-        <DataTable columns={columns} data={paged} ref={tableRef} />
-
-      <div className="flex justify-center gap-2 mt-6">
-        <button
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-          disabled={page === 1}
-          className="px-4 py-1 rounded bg-zinc-700 text-white disabled:opacity-50"
-        >
-          Prev
-        </button>
-        <span className="text-sm text-zinc-400 mt-1">Page {page}</span>
-        <button
-          onClick={() =>
-            setPage((p) =>
-              p < Math.ceil(baseTweets.length / pageSize) ? p + 1 : p
-            )
-          }
-          disabled={page >= Math.ceil(baseTweets.length / pageSize)}
-          className="px-4 py-1 rounded bg-zinc-700 text-white disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
+        <DataTable columns={columns} data={tweets} ref={tableRef} />
       </>
     );
   }
 
   return (
-    <>
     <div className="flex flex-col gap-6 mt-6 items-left">
-      {paged.map((tweet) => (
+      {tweets.map((tweet) => (
         <Card
           key={tweet.tweetId}
           className="w-full max-w-xl rounded-2xl border border-zinc-800 bg-sidebar shadow-md transition-all duration-300 hover:shadow-lg hover:border-sidebarBorder"
@@ -572,28 +543,5 @@ const rankingColumns = [
         </Card>
       ))}
     </div>
-
-    <div className="flex justify-center gap-2 mt-6">
-      <button
-        onClick={() => setPage((p) => Math.max(1, p - 1))}
-        disabled={page === 1}
-        className="px-4 py-1 rounded bg-zinc-700 text-white disabled:opacity-50"
-      >
-        Prev
-      </button>
-      <span className="text-sm text-zinc-400 mt-1">Page {page}</span>
-      <button
-        onClick={() =>
-          setPage((p) =>
-            p < Math.ceil(baseTweets.length / pageSize) ? p + 1 : p
-          )
-        }
-        disabled={page >= Math.ceil(baseTweets.length / pageSize)}
-        className="px-4 py-1 rounded bg-zinc-700 text-white disabled:opacity-50"
-      >
-        Next
-      </button>
-    </div>
-  </>
   );
 }

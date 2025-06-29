@@ -21,6 +21,7 @@ import MoonButton from "@/components/MoonButton";
 
 const navItems = [
   { label: "Coin Analyst", href: "/", icon: LayoutDashboard },
+  { label: "High Impact", href: "/high-impact", icon: BarChart2 },
   { label: "API Key", href: "/api-key", icon: KeyRound },
   { label: "System Status", href: "/system-status", icon: Activity },
   { label: "Docs", href: "/docs", icon: Book },

@@ -33,7 +33,7 @@ export default async function handler(req, res) {
 
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  let end_date = tomorrow.toISOString().split("T")[0];
+  const end_date = tomorrow.toISOString().split("T")[0];
 
   let apiPath = "";
   let body = {};
@@ -51,21 +51,14 @@ export default async function handler(req, res) {
   if (mode === "shiller" || mode === "impact") {
     apiPath = "/search";
 
-    let start_date;
+    let daysAgo = 1;
+    if (window === "24h") daysAgo = 1;
+    else if (window === "7d") daysAgo = 7;
+    else if (window === "30d") daysAgo = 30;
 
-    if (window === "custom" && req.body.customStart && req.body.customEnd) {
-      start_date = req.body.customStart;
-      end_date = req.body.customEnd;
-    } else {
-      let daysAgo = 1;
-      if (window === "24h") daysAgo = 1;
-      else if (window === "7d") daysAgo = 7;
-      else if (window === "30d") daysAgo = 30;
-
-      const start = new Date();
-      start.setDate(tomorrow.getDate() - (daysAgo + 1));
-      start_date = start.toISOString().split("T")[0];
-    }
+    const start = new Date();
+    start.setDate(tomorrow.getDate() - (daysAgo + 1));
+    const start_date = start.toISOString().split("T")[0];
 
     body = {
       keyword,

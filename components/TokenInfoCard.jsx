@@ -50,7 +50,7 @@ export default function TokenInfoCard({ tokenInfo }) {
           <div><span className="text-gray-400">Market Cap:</span> {formatUsd(marketCap)}</div>
           <div><span className="text-gray-400">FDV:</span> {formatUsd(fdv)}</div>
           <div><span className="text-gray-400">Liquidity:</span> {formatUsd(liquidityUsd)}</div>
-          <div><span className="text-gray-400">24h Volume:</span> {formatUsd(volume?.h24)}</div>
+          <div><span className="text-gray-400">24h Volume:</span> {formatUsd(volume?.h24 || volume)}</div>
           <div>
             <span className="text-gray-400">24h Change:</span>{" "}
             <span className={priceChange?.h24 > 0 ? "text-green-400" : "text-red-400"}>

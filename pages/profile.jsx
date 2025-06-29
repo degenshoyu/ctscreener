@@ -7,6 +7,7 @@ import { useState, useEffect, useMemo } from "react"
 import { useToast } from "@/hooks/use-toast";
 import TokenInfoCard from "@/components/TokenInfoCard";
 import TweetList from "@/components/TweetList";
+import TweetListImpact from "@/components/TweetListImpact";
 import { Trash, Wallet, Save as SaveIcon, ArrowRight } from "lucide-react";
 import * as Select from "@radix-ui/react-select";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
@@ -148,6 +149,10 @@ export default function ProfilePage() {
   }
   }, [authenticated, walletAddress]);
 
+const currentHistory = history.find((h) => h.job_id === retriveJobId);
+const currentMode = currentHistory?.mode;
+const currentWindow = currentHistory?.window;
+
   return (
     <DashboardLayout>
       <Head>
@@ -246,7 +251,11 @@ export default function ProfilePage() {
           </div>
           </td>
           <td className="px-4 py-2">
-            {h.mode === "shiller" ? `Top shillers (${h.window})` : "Early callers"}
+            {h.mode === "shiller"
+              ? `Top shillers (${h.window})`
+              : h.mode === "impact"
+              ? `High Impact (${h.window})`
+              : "Early callers"}
           </td>
           <td className="px-4 py-2">
             {h.includeTicker ? (
@@ -470,40 +479,35 @@ export default function ProfilePage() {
     </div>
 
   <div className="w-full overflow-x-auto">
-    <TweetList
-      tweets={sortedPagedTweets}
-      viewMode={retriveViewMode}
-      coinName={retriveData.tokenInfo?.name || "Unknown"}
-      ticker={retriveData.tokenInfo?.symbol || ""}
-      contractAddress={retriveData.tokenInfo?.address || retriveData.tokenInfo?.mint || ""}
-      mode={
-        history.find((h) => h.job_id === retriveJobId)?.mode === "shiller"
-          ? `Top Shiller (${history.find((h) => h.job_id === retriveJobId)?.window})`
-          : "Early Callers"
-      }
-      scannedAt={
-        history.find((h) => h.job_id === retriveJobId)?.created_at || new Date().toISOString()
-      }
-      jobId={retriveJobId}
-    />
+{currentMode === "impact" ? (
+  <TweetListImpact
+    tweets={sortedPagedTweets}
+    viewMode={retriveViewMode}
+    coinName={retriveData.tokenInfo?.name || "Unknown"}
+    ticker={retriveData.tokenInfo?.symbol || ""}
+    contractAddress={retriveData.tokenInfo?.address || retriveData.tokenInfo?.mint || ""}
+    mode={`High Impact (${currentWindow})`}
+    scannedAt={currentHistory?.created_at || new Date().toISOString()}
+    jobId={retriveJobId}
+  />
+) : (
+  <TweetList
+    tweets={sortedPagedTweets}
+    viewMode={retriveViewMode}
+    coinName={retriveData.tokenInfo?.name || "Unknown"}
+    ticker={retriveData.tokenInfo?.symbol || ""}
+    contractAddress={retriveData.tokenInfo?.address || retriveData.tokenInfo?.mint || ""}
+    mode={
+      currentMode === "shiller"
+        ? `Top Shiller (${currentWindow})`
+        : "Early Callers"
+    }
+    scannedAt={currentHistory?.created_at || new Date().toISOString()}
+    jobId={retriveJobId}
+  />
+)}
   </div>
 
-  <div className="flex justify-end gap-2 mt-4">
-    <button
-      onClick={() => setPage(p => Math.max(1, p - 1))}
-      disabled={page === 1}
-      className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
-    >
-      Prev
-    </button>
-    <button
-      onClick={() => setPage(p => p + 1)}
-      disabled={page * pageSize >= retriveData.tweets.length}
-      className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
-    >
-      Next
-    </button>
-  </div>
 </>
 
         </div>

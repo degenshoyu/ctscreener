@@ -1,192 +1,175 @@
 /// pages/high-impact.jsx
 
 import Head from "next/head";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
+import TokenSearchBoxImpact from "@/components/TokenSearchBoxImpact";
+import TokenInfoCard from "@/components/TokenInfoCard";
+import TweetListImpact from "@/components/TweetListImpact";
+import ViewModeToggle from "@/components/ViewModeToggle";
+import { usePrivy } from "@privy-io/react-auth";
 
-export default function HighImpactCallerPage() {
+export default function HighImpactPage() {
+  const { user } = usePrivy();
+  const walletAddress = user?.wallet?.address;
   const [address, setAddress] = useState("");
-  const [range, setRange] = useState("24h");
-  const [start, setStart] = useState("");
-  const [end, setEnd] = useState("");
-  const [includeTicker, setIncludeTicker] = useState(false);
+  const [tokenInfo, setTokenInfo] = useState(null);
   const [tweets, setTweets] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [tweetCount, setTweetCount] = useState(0);
+  const [scanningTweets, setScanningTweets] = useState(false);
+  const [viewMode, setViewMode] = useState("embed");
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
+  const [jobId, setJobId] = useState(null);
+  const [dateOption, setDateOption] = useState("24h");
+  const [customStart, setCustomStart] = useState("");
+  const [customEnd, setCustomEnd] = useState("");
 
-  const handleSearch = async () => {
-    if (!address) {
-      alert("Please enter a token address");
-      return;
-    }
+  const pagedTweets = useMemo(() => {
+    return [...tweets].slice((page - 1) * pageSize, page * pageSize);
+  }, [tweets, page]);
 
-    let startTime, endTime;
-
-    if (range === "custom") {
-      if (!start || !end) {
-        alert("Please select start and end for custom range");
-        return;
-      }
-      // Date-only: set to midnight UTC
-      startTime = new Date(start + "T00:00:00Z").toISOString();
-      endTime = new Date(end + "T23:59:59Z").toISOString();
-    } else {
-      const now = new Date();
-      endTime = now.toISOString();
-      if (range === "24h") {
-        startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
-      } else if (range === "7d") {
-        startTime = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
-      }
-    }
-
-    setIsLoading(true);
-    try {
-      const res = await fetch("/api/twitterSearch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tokenAddress: address,
-          startTime,
-          endTime,
-          includeTicker, // 👈 新增字段
-        }),
-      });
-      const json = await res.json();
-      if (json.tweets && Array.isArray(json.tweets)) {
-        const enriched = await Promise.all(
-          json.tweets.map(async (tweet) => {
-            const ts = new Date(tweet.datetime).toISOString();
-            try {
-              const priceRes = await fetch("/api/historical-price", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  mint: address,
-                  timestamp: ts,
-                }),
-              });
-              const priceJson = await priceRes.json();
-              return { ...tweet, price: priceJson.price ?? null };
-            } catch {
-              return { ...tweet, price: null };
-            }
-          }),
-        );
-        setTweets(enriched);
-      } else {
-        alert("No tweets found");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error searching tweets");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const allTweets = tweets;
 
   return (
     <DashboardLayout>
       <Head>
-        <title>ctScreener - High Impact Callers</title>
+        <title>ctScreener - High Impact Tweets</title>
+        <meta
+          name="description"
+          content="Analyze high-impact tweets mentioning Solana tokens."
+        />
       </Head>
 
       <div className="text-white px-4 py-8">
-        <h1 className="text-5xl font-extrabold mb-2 bg-gradient-to-br from-purple-400 via-pink-300 to-purple-500 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(168,85,247,0.3)]">
-          High Impact Callers
+        <h1
+          className="text-5xl font-extrabold mb-2 bg-gradient-to-br from-blue-400 via-cyan-300 to-blue-500 bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(96,165,250,0.3)]"
+        >
+          High Impact
         </h1>
-        <p className="text-lg text-purple-100/80 italic max-w-lg mb-6">
-          Identify the Tweeters driving your coin’s price
+        <p className="text-lg text-blue-100/80 italic animate-fadeInSlow max-w-lg mb-6">
+          Analyze token mentions that moved the market.
         </p>
 
-        <div className="flex flex-col gap-4 max-w-xl">
-          <input
-            type="text"
-            placeholder="Enter Solana token address..."
-            className="px-5 py-3 rounded-full bg-transparent text-white border border-purple-400/30 backdrop-blur-md"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
+        <div className="flex items-center gap-4 max-w-xl">
+          <TokenSearchBoxImpact
+            address={address}
+            setAddress={setAddress}
+            walletAddress={walletAddress}
+            onTokenInfo={setTokenInfo}
+            onTweets={setTweets}
+            onSearch={setScanningTweets}
+            onTweetCount={setTweetCount}
+            shillerWindow={dateOption}
+            setJobId={setJobId}
+            customStart={customStart}
+            customEnd={customEnd}
           />
-
-          <div className="flex gap-2">
-            {["24h", "7d", "custom"].map((option) => (
-              <button
-                key={option}
-                onClick={() => setRange(option)}
-                className={`px-4 py-2 rounded-full font-medium transition-all duration-300 ${
-                  range === option
-                    ? "bg-gradient-to-br from-purple-500/50 to-pink-400/30 text-white shadow-md"
-                    : "border border-purple-400/30 text-purple-100 hover:bg-purple-400/10 backdrop-blur-md"
-                }`}
-              >
-                {option === "24h" ? "Last 24h" : option === "7d" ? "Last 7 days" : "Custom"}
-              </button>
-            ))}
-          </div>
-
-          {range === "custom" && (
-            <div className="flex gap-4">
-              <input
-                type="date"
-                className="flex-1 px-5 py-3 rounded-full bg-transparent text-white border border-purple-400/30 backdrop-blur-md"
-                value={start}
-                onChange={(e) => setStart(e.target.value)}
-              />
-              <input
-                type="date"
-                className="flex-1 px-5 py-3 rounded-full bg-transparent text-white border border-purple-400/30 backdrop-blur-md"
-                value={end}
-                onChange={(e) => setEnd(e.target.value)}
-              />
-            </div>
-          )}
-
-          <button
-            onClick={() => setIncludeTicker(!includeTicker)}
-            className={`
-              px-3 py-1.5 rounded-full font-medium text-xs transition-all duration-300
-              ${includeTicker
-                ? "bg-gradient-to-br from-purple-500/50 to-pink-400/30 text-white shadow-md"
-                : "border border-purple-400/30 text-purple-100 hover:bg-purple-400/10 backdrop-blur-md"
-              }
-            `}
-          >
-            Include ticker
-            <span className="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-yellow-400 text-black">testing</span>
-          </button>
-
-          <button
-            onClick={handleSearch}
-            disabled={isLoading}
-            className="px-5 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-purple-900/50 to-pink-600/30 border border-purple-400/30 shadow-xl hover:scale-105 transition-all duration-300"
-          >
-            {isLoading ? "Searching..." : "Search"}
-          </button>
         </div>
 
+        <div className="flex items-center gap-2 mt-4">
+          {[
+            { label: "Last 24h", value: "24h" },
+            { label: "Last 7d", value: "7d" },
+            { label: "Custom (≤10d)", value: "custom" },
+          ].map(({ label, value }) => (
+            <button
+              key={value}
+              onClick={() => setDateOption(value)}
+              className={`px-3 py-1.5 rounded-full font-medium transition-all duration-300 ${
+                dateOption === value
+                  ? "bg-gradient-to-br from-blue-400/60 to-cyan-300/30 text-white shadow"
+                  : "border border-blue-400/30 text-blue-100 hover:bg-blue-400/10 backdrop-blur-md"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      {dateOption === "custom" && (
+        <div className="flex gap-4 mt-3 max-w-xl">
+          <div>
+            <label className="block text-sm text-white/70 mb-1">Start Date</label>
+            <input
+              type="date"
+              className="bg-zinc-800 text-white px-3 py-2 rounded border border-zinc-600"
+              value={customStart}
+              onChange={(e) => setCustomStart(e.target.value)}
+              max={customEnd || undefined}
+            />
+          </div>
+          <div>
+            <label className="block text-sm text-white/70 mb-1">End Date</label>
+            <input
+              type="date"
+              className="bg-zinc-800 text-white px-3 py-2 rounded border border-zinc-600"
+              value={customEnd}
+              onChange={(e) => setCustomEnd(e.target.value)}
+              min={customStart || undefined}
+            />
+          </div>
+        </div>
+      )}
+        <div className="mt-6">
+          <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
+        </div>
+
+        {tokenInfo && (
+          <div className="mt-6">
+            <TokenInfoCard tokenInfo={tokenInfo} />
+          </div>
+        )}
+
+        {scanningTweets && (
+          <div className="mt-4 max-w-xl">
+            <div className="flex items-center text-gray-400 mb-2">
+              <svg
+                className="animate-spin h-5 w-5 mr-2 text-blue-400"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                ></path>
+              </svg>
+              <span className="text-sm">
+                <span className="text-blue-300">ctScreener</span> is scanning tweets...
+              </span>
+            </div>
+            <div className="text-sm text-gray-300 ml-7">
+              {tweetCount > 0
+                ? `🔎 Collected ${tweetCount} tweet${tweetCount === 1 ? "" : "s"} so far.`
+                : "🔎 Waiting for tweets to appear..."}
+            </div>
+          </div>
+        )}
+
         {tweets.length > 0 && (
-          <div className="mt-8 max-w-3xl">
-            <h2 className="text-2xl font-bold mb-4">Results:</h2>
-            <ul className="space-y-4">
-              {tweets.map((tweet, idx) => (
-                <li
-                  key={idx}
-                  className="p-4 border border-purple-400/30 rounded-lg backdrop-blur-md"
-                >
-                  <p className="text-sm text-purple-100/80">
-                    🕒 {tweet.datetime}
-                  </p>
-                  <p className="text-white mb-2">{tweet.content}</p>
-                  <p className="text-green-400">
-                    Swap Price:{" "}
-                    {tweet.price ? `$${tweet.price.toFixed(6)}` : "N/A"}
-                  </p>
-                </li>
-              ))}
-            </ul>
+          <div className="mt-6 max-w-full">
+            <TweetListImpact
+              tweets={allTweets}
+              viewMode={viewMode}
+              coinName={tokenInfo?.name || "Unknown"}
+              ticker={tokenInfo?.symbol || ""}
+              contractAddress={tokenInfo?.address || ""}
+              mode={`High Impact (${dateOption})`}
+              scannedAt={new Date().toISOString()}
+              jobId={jobId}
+            />
           </div>
         )}
       </div>
     </DashboardLayout>
   );
 }
-
