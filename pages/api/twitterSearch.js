@@ -62,9 +62,16 @@ export default async function handler(req, res) {
       else if (window === "7d") daysAgo = 7;
       else if (window === "30d") daysAgo = 30;
 
-      const start = new Date();
-      start.setDate(tomorrow.getDate() - (daysAgo + 1));
+      const today = new Date();
+
+      const start = new Date(today);
+      start.setDate(today.getDate() - daysAgo);
+
+      const end = new Date(today);
+      end.setDate(today.getDate() + 1);
+
       start_date = start.toISOString().split("T")[0];
+      end_date = end.toISOString().split("T")[0];
     }
 
     body = {
