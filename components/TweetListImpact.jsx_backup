@@ -79,19 +79,18 @@ async function fetchBatchPrices(baseTweets, contractAddress) {
 
   const data = await res.json();
 
-  if (!data.prices || typeof data.prices !== "object") {
+    if (!data.prices || typeof data.prices !== "object") {
     console.warn("⚠️ Invalid prices format from API:", data);
     return {};
   }
 
   const out = {};
-  for (const row of data.prices || []) {
+  for (const row of data.prices) {
     const tweetId = String(row.tweet_id);
     const k = row.key;
     const fallbackKey = `${tweetId}-${k}`;
     out[fallbackKey] = row.price ?? null;
   }
-
   return out;
 }
 

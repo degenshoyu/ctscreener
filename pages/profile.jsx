@@ -481,7 +481,7 @@ const currentWindow = currentHistory?.window;
   <div className="w-full overflow-x-auto">
 {currentMode === "impact" ? (
   <TweetListImpact
-    tweets={sortedPagedTweets}
+    tweets={retriveData.tweets}
     viewMode={retriveViewMode}
     coinName={retriveData.tokenInfo?.name || "Unknown"}
     ticker={retriveData.tokenInfo?.symbol || ""}
