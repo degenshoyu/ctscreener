@@ -197,7 +197,7 @@ export default function DashboardLayout({ children }) {
               {!collapsed && (
                 <div className="flex flex-col leading-tight">
                   <span className="text-xl font-bold">ctScreener</span>
-                  <span className="text-xs text-gray-400">v0.2 alpha</span>
+                  <span className="text-xs text-gray-400">v0.2 beta</span>
                 </div>
               )}
             </a>
