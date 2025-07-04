@@ -85,15 +85,13 @@ async function fetchBatchPrices(baseTweets, contractAddress) {
   }
 
   const out = {};
-  for (const row of data.prices || []) {
-    const tweetId = String(row.tweet_id);
-    const k = row.key;
-    const fallbackKey = `${tweetId}-${k}`;
-    out[fallbackKey] = row.price ?? null;
+  for (const item of data.prices) {
+    const { tweet_id, key, price } = item;
+    const mapKey = `${tweet_id}-${key}`;
+    out[mapKey] = price ?? null;
   }
-
   return out;
-}
+  }
 
 async function pollPriceJob(jobId, maxAttempts = 3, interval = 1500) {
   let attempts = 0;

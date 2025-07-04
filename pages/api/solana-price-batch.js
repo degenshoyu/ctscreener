@@ -43,29 +43,39 @@ export default async function handler(req, res) {
   const client = await clientPromise;
   const db = client.db("ctScreener");
 
+  const queries = keys.map(({ tweet_id, key }) => {
+    const tweetIdStr = String(tweet_id);
+    return db
+      .collection("tweet_prices")
+      .findOne(
+        {
+          tweet_id: tweetIdStr,
+          token,
+          key,
+          price: { $ne: null },
+        },
+        {
+          sort: { fetched_at: -1 },
+        },
+      )
+      .then((doc) => {
+        if (doc && doc.price != null) {
+          return { key: `${tweetIdStr}-${key}`, price: doc.price };
+        } else {
+          console.log(
+            `⚠️ No price found for tweet_id=${tweetIdStr} key=${key} token=${token}`,
+          );
+          return null;
+        }
+      });
+  });
+
+  const results = await Promise.all(queries);
+
   const priceMap = {};
-
-  for (const k of keys) {
-    const tweetIdStr = String(k.tweet_id);
-
-    const priceDoc = await db.collection("tweet_prices").findOne(
-      {
-        tweet_id: tweetIdStr,
-        token,
-        key: k.key,
-        price: { $ne: null },
-      },
-      {
-        sort: { fetched_at: -1 },
-      },
-    );
-
-    if (priceDoc && priceDoc.price != null) {
-      priceMap[`${tweetIdStr}-${k.key}`] = priceDoc.price;
-    } else {
-      console.log(
-        `⚠️ No price found for tweet_id=${tweetIdStr} key=${k.key} token=${token}`,
-      );
+  for (const r of results) {
+    if (r) {
+      priceMap[r.key] = r.price;
     }
   }
 

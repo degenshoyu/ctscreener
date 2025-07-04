@@ -25,37 +25,54 @@ export default function CommunityPage() {
     We’re building the most powerful data platform for crypto Twitter. Join our community to shape what comes next — and help us spread the word about the <span className="text-yellow-400 font-semibold">$ctS</span> token.
   </p>
 
-  <div className="grid gap-6 max-w-xl">
-    <div className="
-      bg-white/5 border border-blue-400/20
-      backdrop-blur-lg shadow-xl rounded-2xl p-6
-    ">
-      <h2 className="text-xl font-semibold text-blue-400 mb-1">Telegram</h2>
-      <a href="https://t.me/ctscreener" target="_blank" rel="noopener noreferrer" className="text-white underline">
-        https://t.me/ctscreener
-      </a>
-    </div>
+<div className="mt-12 space-y-10 max-w-xl">
+  <section className="bg-white/5 border border-blue-400/20 backdrop-blur-lg shadow-xl rounded-2xl p-6">
+    <h2 className="text-xl font-semibold text-blue-400 mb-3">🔗 Useful Links</h2>
+    <ul className="list-disc list-inside text-blue-100/90 space-y-2">
+      <li>
+        🌐 Website:{" "}
+        <a href="https://www.ctscreener.xyz" target="_blank" rel="noopener noreferrer" className="underline text-white hover:text-blue-300">
+          https://www.ctscreener.xyz
+        </a>
+      </li>
+      <li>
+        🐦 Twitter:{" "}
+        <a href="https://x.com/ctScreener" target="_blank" rel="noopener noreferrer" className="underline text-white hover:text-blue-300">
+          https://x.com/ctScreener
+        </a>
+      </li>
+      <li>
+        👥 X Community: <a href="https://x.com/i/communities/1933756019555061941/" target="_blank" rel="noopener noreferrer" className="underline text-white hover:text-blue-300">Join on X</a>
+      </li>
+      <li>
+        💬 Telegram:{" "}
+        <a href="https://t.me/ctscreener" target="_blank" rel="noopener noreferrer" className="underline text-white hover:text-blue-300">
+          https://t.me/ctscreener
+        </a>
+      </li>
+      <li>
+        💠 Discord:{" "}
+        <a href="https://discord.com/invite/Yhv3MEzyXB" target="_blank" rel="noopener noreferrer" className="underline text-white hover:text-blue-300">
+          https://discord.com/invite/Yhv3MEzyXB
+        </a>
+      </li>
+    </ul>
+  </section>
 
-    <div className="
-      bg-white/5 border border-blue-400/20
-      backdrop-blur-lg shadow-xl rounded-2xl p-6
-    ">
-      <h2 className="text-xl font-semibold text-blue-400 mb-1">Twitter</h2>
-      <a href="https://twitter.com/ctscreener" target="_blank" rel="noopener noreferrer" className="text-white underline">
-        https://twitter.com/ctscreener
+  <section className="bg-white/5 border border-blue-400/20 backdrop-blur-lg shadow-xl rounded-2xl p-6">
+    <h2 className="text-xl font-semibold text-blue-400 mb-3">🔒 Token Lock Info</h2>
+    <p className="text-blue-100/90 mb-2">
+      10% of the <span className="text-yellow-300 font-semibold">$ctS</span> total supply is locked until <strong>Sep 12, 2025</strong>.
+    </p>
+    <p className="text-sm text-blue-200">
+      📜 Proof:{" "}
+      <a href="https://solana.team.finance/view-coin/2pHPoTfkRjhxqo5JDzEyqRTftQivJHCiUiT5uGp2pump" target="_blank" rel="noopener noreferrer" className="underline text-white hover:text-blue-300">
+        View on Team Finance
       </a>
-    </div>
+    </p>
+  </section>
+</div>
 
-    <div className="
-      bg-white/5 border border-blue-400/20
-      backdrop-blur-lg shadow-xl rounded-2xl p-6
-    ">
-      <h2 className="text-xl font-semibold text-blue-400 mb-1">Twitter Community</h2>
-      <a href="https://x.com/i/communities/1933756019555061941/" target="_blank" rel="noopener noreferrer" className="text-white underline">
-        Join the X community now!
-      </a>
-    </div>
-  </div>
 </div>
 
     </DashboardLayout>

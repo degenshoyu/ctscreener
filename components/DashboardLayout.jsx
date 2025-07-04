@@ -20,7 +20,7 @@ import { useState, useEffect, useRef } from "react";
 import MoonButton from "@/components/MoonButton";
 
 const navItems = [
-  { label: "Coin Analyst", href: "/", icon: LayoutDashboard },
+  { label: "Coin Analyst", href: "/analyst", icon: LayoutDashboard },
   { label: "High Impact", href: "/high-impact", icon: BarChart2 },
   { label: "API Key", href: "/api-key", icon: KeyRound },
   { label: "System Status", href: "/system-status", icon: Activity },
@@ -197,7 +197,7 @@ export default function DashboardLayout({ children }) {
               {!collapsed && (
                 <div className="flex flex-col leading-tight">
                   <span className="text-xl font-bold">ctScreener</span>
-                  <span className="text-xs text-gray-400">v0.1 alpha</span>
+                  <span className="text-xs text-gray-400">v0.2 alpha</span>
                 </div>
               )}
             </a>
@@ -251,6 +251,9 @@ export default function DashboardLayout({ children }) {
       <main className="flex-1 p-6 overflow-y-auto bg-mainBg">
         {children}
       </main>
+    <footer className="text-center text-sm text-white/40 py-4">
+      © {new Date().getFullYear()} ctScreener. All rights reserved.
+    </footer>
       </div>
 
       {/* === Mobile Bottom Nav === */}
