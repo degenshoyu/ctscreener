@@ -173,20 +173,6 @@ export default function ApiKeyPage() {
             </div>
           </div>
 
-<p className="text-sm text-yellow-200/90">
-  🚧 API is in alpha — only selected partners can use it.
-  Please contact the admin at{" "}
-  <a
-    href="https://t.me/ctscreener"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="underline text-blue-400 hover:text-blue-300"
-  >
-    https://t.me/ctscreener
-  </a>{" "}
-  to enable API access. We will need to know your use case and purpose.
-</p>
-
 <p className="text-sm text-yellow-200/90 mt-4">
   📖 Learn how to use the API by visiting{" "}
   <a
