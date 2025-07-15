@@ -67,23 +67,29 @@ export default function HomePage() {
         return;
       }
 
-  const combinedText = allTweets
-    .slice(0, 100)
-    .map((t, i) => {
-      const text = t.textContent || t.content || t.text || "";
-      const date = t.datetime || t.createdAt || "unknown";
-      const views = t.views ?? "N/A";
-      const likes = t.likes ?? "N/A";
-      const retweets = t.retweets ?? "N/A";
-      const replies = t.replies ?? "N/A";
-      return `Tweet ${i + 1} by @${t.tweeter}
-  Date: ${date}
-  Views: ${views} | Likes: ${likes} | Retweets: ${retweets} | Replies: ${replies}
+const projectHeader = `Project Info:
+Name: ${tokenInfo?.name || "Unknown"}
+Symbol: $${tokenInfo?.symbol || ""}
+`;
 
-  ${text}`;
-    })
-    .join("\n\n")
-    .slice(0, 5000);
+const combinedText = projectHeader + "\n\n" + allTweets
+  .filter((t) => t.textContent && t.textContent.length > 10)
+  .slice(0, 100)
+  .map((t, i) => {
+    const text = t.textContent || t.content || t.text || "";
+    const date = t.datetime || t.createdAt || "unknown";
+    const views = t.views ?? "N/A";
+    const likes = t.likes ?? "N/A";
+    const retweets = t.retweets ?? "N/A";
+    const replies = t.replies ?? "N/A";
+    return `Tweet ${i + 1} by @${t.tweeter}
+Date: ${date}
+Views: ${views} | Likes: ${likes} | Retweets: ${retweets} | Replies: ${replies}
+
+${text}`;
+  })
+  .join("\n\n")
+  .slice(0, 5000);
 
       const res = await fetch("/api/ai-analyze", {
         method: "POST",
