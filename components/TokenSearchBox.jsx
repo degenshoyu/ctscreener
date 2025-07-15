@@ -71,31 +71,6 @@ export default function TokenSearchBox({
         onSearch(false);
         setIsSearching(false);
 
-        if (viewMode === "ai" && onAISummary) {
-          const combinedText = selectedTweets.map(t => t.textContent || "").join("\n\n").slice(0, 5000); // 限制长度
-        try {
-          if (setAiLoading) setAiLoading(true);
-          const aiRes = await fetch("/api/ai-analyze", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              text: `You are a crypto analyst AI. I will now give you a list of tweets. Please summarize their overall sentiment and highlight any token names or symbols mentioned:\n\n${combinedText}`,
-            }),
-          });
-
-          const aiText = await aiRes.text();
-          console.log("🧠 AI summary received:", aiText);
-          onAISummary(aiText);
-        } catch (err) {
-          console.error("🛑 AI summary error:", err);
-          onAISummary("AI analysis failed.");
-        } finally {
-          if (setAiLoading) setAiLoading(false);
-        }
-      }
-
       } else if (jobJson.status === "processing") {
         console.log("⏳ Job still processing, retrying...");
         if (onTweetCount && typeof jobJson.tweets_count === "number") {
