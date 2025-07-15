@@ -83,7 +83,7 @@ export default function HomePage() {
   ${text}`;
     })
     .join("\n\n")
-    .slice(0, 10000);
+    .slice(0, 5000);
 
       const res = await fetch("/api/ai-analyze", {
         method: "POST",
