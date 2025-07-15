@@ -1,5 +1,5 @@
 import Head from "next/head";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
@@ -17,11 +17,15 @@ import * as Select from "@radix-ui/react-select";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { List, LayoutGrid } from "lucide-react";
 import ViewModeToggle from "@/components/ViewModeToggle";
+import PaginationButtons from "@/components/PaginationButtons";
 
 export default function HomePage() {
   const { user } = usePrivy();
   const walletAddress = user?.wallet?.address;
   const [address, setAddress] = useState("");
+
+  const [aiSummary, setAiSummary] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
 
   const [activeTab, setActiveTab] = useState("earliest");
   const [shillerWindow, setShillerWindow] = useState("24h");
@@ -46,6 +50,62 @@ export default function HomePage() {
   }, [tweets, page]);
 
   const [jobId, setJobId] = useState(null);
+
+  const runAISummary = async () => {
+    if (!jobId) return;
+
+    try {
+      setAiLoading(true);
+
+      const jobRes = await fetch(`/api/jobProxy?job_id=${jobId}`);
+      const jobData = await jobRes.json();
+
+      const allTweets = Array.isArray(jobData.tweets) ? jobData.tweets : [];
+
+      if (allTweets.length === 0) {
+        setAiSummary("No tweet data found for analysis.");
+        return;
+      }
+
+  const combinedText = allTweets
+    .slice(0, 100)
+    .map((t, i) => {
+      const text = t.textContent || t.content || t.text || "";
+      const date = t.datetime || t.createdAt || "unknown";
+      const views = t.views ?? "N/A";
+      const likes = t.likes ?? "N/A";
+      const retweets = t.retweets ?? "N/A";
+      const replies = t.replies ?? "N/A";
+      return `Tweet ${i + 1} by @${t.tweeter}
+  Date: ${date}
+  Views: ${views} | Likes: ${likes} | Retweets: ${retweets} | Replies: ${replies}
+
+  ${text}`;
+    })
+    .join("\n\n")
+    .slice(0, 5000);
+
+      const res = await fetch("/api/ai-analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: combinedText }),
+      });
+
+      const result = await res.text();
+      setAiSummary(result);
+    } catch (err) {
+      console.error("❌ AI summary fetch failed:", err);
+      setAiSummary("AI analysis failed.");
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (viewMode === "ai" && jobId && !aiSummary) {
+      runAISummary();
+    }
+  }, [viewMode, jobId]);
 
   return (
     <DashboardLayout>
@@ -92,6 +152,9 @@ export default function HomePage() {
             activeTab={activeTab}
             shillerWindow={shillerWindow}
             setJobId={setJobId}
+            viewMode={viewMode}
+            onAISummary={setAiSummary}
+            setAiLoading={setAiLoading}
           />
         </div>
 
@@ -202,40 +265,70 @@ export default function HomePage() {
           </div>
         )}
 
-        {tweets.length > 0 && (
-          <div className="mt-6 max-w-full">
-            <TweetList
-              tweets={pagedTweets}
-              viewMode={viewMode}
-              coinName={tokenInfo?.name || "Unknown"}
-              ticker={tokenInfo?.symbol || ""}
-              contractAddress={tokenInfo?.address || ""}
-              mode={
-                activeTab === "shiller"
-                  ? `Top Shiller (${shillerWindow})`
-                  : "Early Callers"
-              }
-              scannedAt={new Date().toISOString()}
-              jobId={jobId}
-            />
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
-              >
-                Prev
-              </button>
-              <button
-                onClick={() => setPage((p) => p + 1)}
-                disabled={page * pageSize >= tweets.length}
-                className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
-          </div>
+    {tweets.length > 0 && (
+  <div className="mt-6 max-w-full">
+    {viewMode === "embed" && (
+      <>
+        <TweetList
+          tweets={pagedTweets}
+          viewMode="embed"
+          coinName={tokenInfo?.name || "Unknown"}
+          ticker={tokenInfo?.symbol || ""}
+          contractAddress={tokenInfo?.address || ""}
+          mode={
+            activeTab === "shiller"
+              ? `Top Shiller (${shillerWindow})`
+              : "Early Callers"
+          }
+          scannedAt={new Date().toISOString()}
+          jobId={jobId}
+        />
+        <PaginationButtons
+          page={page}
+          pageSize={pageSize}
+          total={tweets.length}
+          setPage={setPage}
+        />
+      </>
+    )}
+
+    {viewMode === "list" && (
+      <>
+        <TweetList
+          tweets={pagedTweets}
+          viewMode="list"
+          coinName={tokenInfo?.name || "Unknown"}
+          ticker={tokenInfo?.symbol || ""}
+          contractAddress={tokenInfo?.address || ""}
+          mode={
+            activeTab === "shiller"
+              ? `Top Shiller (${shillerWindow})`
+              : "Early Callers"
+          }
+          scannedAt={new Date().toISOString()}
+          jobId={jobId}
+        />
+        <PaginationButtons
+          page={page}
+          pageSize={pageSize}
+          total={tweets.length}
+          setPage={setPage}
+        />
+      </>
+    )}
+
+    {viewMode === "ai" && (
+      <div className="mt-6 max-w-3xl bg-purple-900/20 border border-purple-500/30 rounded-xl p-6 shadow backdrop-blur text-white">
+        <h2 className="text-2xl font-bold mb-4">🧠 AI Summary</h2>
+        {aiLoading ? (
+          <p className="text-purple-300 italic">Analyzing tweets with AI...</p>
+        ) : (
+          <pre className="whitespace-pre-wrap text-sm text-purple-100">{aiSummary}</pre>
         )}
+      </div>
+    )}
+  </div>
+)}
       </div>
     </DashboardLayout>
   );
