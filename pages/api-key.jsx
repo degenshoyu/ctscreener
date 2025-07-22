@@ -181,7 +181,7 @@ export default function ApiKeyPage() {
     rel="noopener noreferrer"
     className="underline text-blue-400 hover:text-blue-300"
   >
-    https://api.ctscreener.xyz/test.html
+    https://api.ctscreener.xyz/docs/
   </a>.
 </p>
 
