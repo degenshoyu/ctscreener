@@ -176,7 +176,7 @@ export default function ApiKeyPage() {
 <p className="text-sm text-yellow-200/90 mt-4">
   📖 Learn how to use the API by visiting{" "}
   <a
-    href="https://api.ctscreener.xyz/test.html"
+    href="https://api.ctscreener.xyz/docs/"
     target="_blank"
     rel="noopener noreferrer"
     className="underline text-blue-400 hover:text-blue-300"
