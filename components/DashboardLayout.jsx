@@ -21,7 +21,7 @@ import MoonButton from "@/components/MoonButton";
 
 const navItems = [
   { label: "Coin Analyst", href: "/analyst", icon: LayoutDashboard },
-  { label: "High Impact", href: "/high-impact", icon: BarChart2 },
+  { label: "High Impact", href: "", icon: BarChart2, disabled: true },
   { label: "API Key", href: "/api-key", icon: KeyRound },
   { label: "System Status", href: "/system-status", icon: Activity },
   { label: "Docs", href: "/docs", icon: Book },
@@ -206,39 +206,63 @@ export default function DashboardLayout({ children }) {
 
         {/* Navigation */}
         <nav className="space-y-1">
-          {navItems.map(({ label, href, icon: Icon }) => {
-            const active = router.pathname === href;
-            return (
-              <Link key={href} href={href} legacyBehavior>
-                  {collapsed ? (
-                    <a
-                        className={` group block w-full flex items-center justify-center w-10 h-10 rounded-md transition-all duration-300 ${
-                          active
-                          ? "bg-gradient-to-br from-blue-500/50 to-blue-400/30 text-white shadow-md"
-      : "border-blue-400/30 hover:bg-blue-400/10 backdrop-blur-md"
 
-                        }`}
-                      >
-                       <TooltipWrapper label={label}>
-                        <Icon className="w-[18px] h-[18px] transition-transform duration-300 group-hover:rotate-180" />
-                      </TooltipWrapper>
-                    </a>
-                  ) : (
-                    <a
-                      className={`group flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
-                        active
-                            ? "bg-gradient-to-br from-blue-500/50 to-blue-400/30 text-white shadow-md"
-                            : " hover:bg-blue-400/10 hover:scale-[1.05] hover:shadow-md backdrop-blur-md "
+    {navItems.map(({ label, href, icon: Icon, disabled }) => {
+  const active = router.pathname === href;
 
-                      }`}
-                    >
-                      <Icon className="w-[18px] h-[18px] transition-transform duration-300 group-hover:rotate-180" />
-                      <span>{label}</span>
-                    </a>
-                  )}
-              </Link>
-            );
-          })}
+if (disabled) {
+  return collapsed ? (
+    <div
+      key={label}
+      className="group flex items-center justify-center w-10 h-10 rounded-md text-gray-500 cursor-not-allowed"
+    >
+      <TooltipWrapper label="Upgrading...">
+        <Icon className="w-[18px] h-[18px] opacity-40" />
+      </TooltipWrapper>
+    </div>
+  ) : (
+    <div
+      key={label}
+      className="group flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-500 cursor-not-allowed"
+    >
+      <TooltipWrapper label="Upgrading...">
+        <Icon className="w-[18px] h-[18px] opacity-40" />
+      </TooltipWrapper>
+      <span>{label}</span>
+    </div>
+  );
+}
+
+return collapsed ? (
+  <Link key={href} href={href} legacyBehavior>
+    <a
+      className={`group block w-full flex items-center justify-center w-10 h-10 rounded-md transition-all duration-300 ${
+        active
+          ? "bg-gradient-to-br from-blue-500/50 to-blue-400/30 text-white shadow-md"
+          : "border-blue-400/30 hover:bg-blue-400/10 backdrop-blur-md"
+      }`}
+    >
+      <TooltipWrapper label={label}>
+        <Icon className="w-[18px] h-[18px] transition-transform duration-300 group-hover:rotate-180" />
+      </TooltipWrapper>
+    </a>
+  </Link>
+) : (
+  <Link key={href} href={href} legacyBehavior>
+    <a
+      className={`group flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all duration-300 ${
+        active
+          ? "bg-gradient-to-br from-blue-500/50 to-blue-400/30 text-white shadow-md"
+          : " hover:bg-blue-400/10 hover:scale-[1.05] hover:shadow-md backdrop-blur-md "
+      }`}
+    >
+      <Icon className="w-[18px] h-[18px] transition-transform duration-300 group-hover:rotate-180" />
+      <span>{label}</span>
+    </a>
+  </Link>
+);
+})}
+
         </nav>
       </aside>
 
@@ -258,21 +282,36 @@ export default function DashboardLayout({ children }) {
 
       {/* === Mobile Bottom Nav === */}
 <nav className="fixed bottom-0 left-0 w-full flex justify-around bg-mainBg/80 backdrop-blur-md border-t border-blue-400/30 shadow-md p-1 md:hidden z-50">
-  {navItems.map(({ label, href, icon: Icon }) => {
-    const active = router.pathname === href;
+{navItems.map(({ label, href, icon: Icon, disabled }) => {
+  const active = router.pathname === href;
+
+  if (disabled) {
     return (
-      <Link key={href} href={href} legacyBehavior>
-        <a
-          className={`flex-1 flex flex-col items-center justify-center py-1 text-xs font-medium transition ${
-            active ? "text-white" : "text-blue-100 hover:text-white"
-          }`}
-        >
-          <Icon className="w-6 h-6 mb-0.5" />
-          {label.split(" ")[0]}
-        </a>
-      </Link>
+      <div
+        key={label}
+        className="flex-1 flex flex-col items-center justify-center py-1 text-xs font-medium text-gray-500 cursor-not-allowed"
+      >
+        <TooltipWrapper label="Upgrading...">
+          <Icon className="w-6 h-6 mb-0.5 opacity-40" />
+        </TooltipWrapper>
+        {label.split(" ")[0]}
+      </div>
     );
-  })}
+  }
+
+  return (
+    <Link key={href} href={href} legacyBehavior>
+      <a
+        className={`flex-1 flex flex-col items-center justify-center py-1 text-xs font-medium transition ${
+          active ? "text-white" : "text-blue-100 hover:text-white"
+        }`}
+      >
+        <Icon className="w-6 h-6 mb-0.5" />
+        {label.split(" ")[0]}
+      </a>
+    </Link>
+  );
+})}
 </nav>
 
     </div>
