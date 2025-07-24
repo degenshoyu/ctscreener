@@ -49,7 +49,7 @@ export default async function handler(req, res) {
   }
 
   if (mode === "shiller" || mode === "impact") {
-    apiPath = "/search";
+    apiPath = "/search/speed";
 
     let start_date;
 
