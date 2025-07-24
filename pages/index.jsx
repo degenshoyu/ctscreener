@@ -50,18 +50,17 @@ export default function LandingPage() {
   {/* Feature: High Impact Caller */}
   <div className="bg-white/5 border border-blue-400/20 rounded-xl p-6 backdrop-blur-md shadow-md hover:shadow-xl transition min-h-[340px] flex flex-col justify-between">
     <div>
-      <h3 className="text-2xl font-semibold text-blue-300 mb-2">📈 High Impact Caller</h3>
-      <p className="text-sm text-blue-100/90">
-        Go beyond likes and retweets.<br /><br />
-        By combining on-chain transactions with Twitter activity, High Impact Caller reveals which influencers truly move markets — filterable by date and impact level.
-      </p>
-    </div>
-    <Link
-      href="/high-impact"
-      className="mt-6 block w-full text-center px-4 py-2 text-sm font-semibold text-white bg-gradient-to-br from-blue-500 to-cyan-400 rounded-md hover:from-blue-600 hover:to-cyan-500 transition"
-    >
-      ➤ Explore High Impact
-    </Link>
+<h3 className="text-2xl font-semibold text-blue-300 mb-2">📈 High Impact Caller</h3>
+<p className="text-sm text-blue-100/90">
+  🚧 This feature is currently being upgraded.<br /><br />
+  High Impact Caller will return soon with a better model and fresher data.
+</p>
+<div
+  className="mt-6 block w-full text-center px-4 py-2 text-sm font-semibold text-blue-200/60 border border-blue-400/20 rounded-md bg-blue-500/10 cursor-not-allowed"
+>
+  🔄 Under Upgrade — Coming Soon
+</div>
+
   </div>
 
   {/* Feature: Developer API */}
