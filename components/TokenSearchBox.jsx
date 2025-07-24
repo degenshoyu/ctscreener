@@ -115,6 +115,7 @@ export default function TokenSearchBox({
     try {
 
     if (activeTab === "shiller") {
+      /*
       console.log("🔑 Checking $ctS balance for wallet:", walletAddress);
       const balanceRes = await fetch(`/api/checkBalance?wallet=${walletAddress}`);
       const { balance } = await balanceRes.json();
@@ -134,6 +135,7 @@ export default function TokenSearchBox({
 
       return;
     }
+    */
   }
 
       onSearch(true);
